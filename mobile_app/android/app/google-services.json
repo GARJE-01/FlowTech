@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "335159071335",
+    "project_id": "flowtech-285cd",
+    "storage_bucket": "flowtech-285cd.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:335159071335:android:a562d697498d83582afac2",
+        "android_client_info": {
+          "package_name": "com.flowtech.salesman"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCmfi64g_iqCPiyMaJwIuEKBh11suCIJrE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
