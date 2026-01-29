@@ -41,7 +41,9 @@ class OrderDetailScreen extends ConsumerWidget {
           // Debug Actions
           PopupMenuButton<String>(
             onSelected: (value) {
-              if (value == 'approve') {
+              if (value == 'invoice') {
+                context.push('/invoices/$orderId');
+              } else if (value == 'approve') {
                 ref.read(orderListProvider.notifier).simulateAdminAction(orderId, true);
                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Order Approved (Simulated)')));
               } else if (value == 'reject') {
@@ -51,6 +53,8 @@ class OrderDetailScreen extends ConsumerWidget {
             },
             itemBuilder: (BuildContext context) {
               return [
+                if (ref.read(orderListProvider.notifier).getOrderById(orderId)?.status == OrderStatus.approved)
+                   const PopupMenuItem(value: 'invoice', child: Text('View Invoice')),
                 const PopupMenuItem(value: 'approve', child: Text('Simulate Approve (Dev)')),
                 const PopupMenuItem(value: 'reject', child: Text('Simulate Reject (Dev)')),
               ];

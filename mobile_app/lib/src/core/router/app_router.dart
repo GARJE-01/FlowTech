@@ -20,6 +20,23 @@ import '../../features/order/presentation/order_tracking_placeholder_screen.dart
 import '../../features/order/presentation/order_shop_selection_screen.dart'; // New Import
 import '../../features/order_tracking/presentation/order_list_screen.dart'; // New Import
 import '../../features/order_tracking/presentation/order_detail_screen.dart'; // New Import
+import '../../features/invoice/presentation/invoice_screen.dart'; // New Import
+import '../../features/payment/presentation/payment_list_screen.dart'; // New Import
+import '../../features/payment/presentation/payment_detail_screen.dart';
+import '../../features/notification/presentation/notification_list_screen.dart'; // New Import
+import '../../features/notification/presentation/notification_detail_screen.dart'; // New Import
+import '../../features/reports/presentation/reports_home_screen.dart';
+import '../../features/reports/presentation/daily_summary_screen.dart';
+import '../../features/reports/presentation/period_summary_screen.dart';
+import '../../features/reports/presentation/shop_report_screen.dart';
+import '../../features/reports/presentation/product_report_screen.dart';
+import '../../features/reports/presentation/performance_screen.dart';
+import '../../features/reports/presentation/reports_home_screen.dart';
+import '../../features/reports/presentation/daily_summary_screen.dart';
+import '../../features/reports/presentation/period_summary_screen.dart';
+import '../../features/reports/presentation/shop_report_screen.dart';
+import '../../features/reports/presentation/product_report_screen.dart';
+import '../../features/reports/presentation/performance_screen.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
@@ -103,11 +120,6 @@ final routerProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => const ShopListScreen(),
             routes: [
               GoRoute(
-                path: 'add',
-                parentNavigatorKey: _rootNavigatorKey, 
-                builder: (context, state) => const AddShopScreen(),
-              ),
-              GoRoute(
                 path: ':id',
                 builder: (context, state) => ShopDetailScreen(shopId: state.pathParameters['id']!),
               ),
@@ -119,26 +131,30 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/orders',
             builder: (context, state) => const OrderListScreen(),
-            routes: [
-              GoRoute(
-                 path: ':id',
-                 parentNavigatorKey: _rootNavigatorKey,
-                 builder: (context, state) => OrderDetailScreen(orderId: state.pathParameters['id']!),
-              ),
-
-              GoRoute(
-                path: 'create',
-                 parentNavigatorKey: _rootNavigatorKey,
-                builder: (context, state) => const PlaceholderScreen(title: 'Create New Order'),
-              ),
-            ],
           ),
 
-          // --- Feature Other: Bills ---
+
+
+// ...
+
+
+
+           // --- Feature Other: Bills ---
           GoRoute(
             path: '/bills',
-            builder: (context, state) => const PlaceholderScreen(title: 'Bills & Invoices'),
+             // For now, link generic bills to "Orders" or specific invoice list if we had one.
+             // But requirement says "Invoice accessible from Dashboard".
+             // Let's redirect /bills to /orders for now as it's the gateway.
+             redirect: (context, state) => '/orders', 
           ),
+          
+          GoRoute(
+            path: '/payments',
+            builder: (context, state) => const PaymentListScreen(),
+
+          ),
+          
+
           
                     // --- Feature Profile ---
           GoRoute(
@@ -146,19 +162,103 @@ final routerProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => const ProfileScreen(),
           ),
           
-          // --- Feature Notifications
-          GoRoute(
-            path: '/notifications',
-             builder: (context, state) => const PlaceholderScreen(title: 'Notifications'),
-             routes: [
-               GoRoute(
-                path: ':id',
-                parentNavigatorKey: _rootNavigatorKey,
-                builder: (context, state) => PlaceholderScreen(title: 'Notification (ID: ${state.pathParameters['id']})'),
-              ),
-            ],
-          ),
+
         ],
+      ),
+      
+      // --- Full Screen Routes (Outside Shell) ---
+      GoRoute(
+        path: '/shops/add',
+        parentNavigatorKey: _rootNavigatorKey, 
+        builder: (context, state) => const AddShopScreen(),
+      ),
+      GoRoute(
+         path: '/orders/:id',
+         parentNavigatorKey: _rootNavigatorKey,
+         builder: (context, state) => OrderDetailScreen(orderId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '/orders/create',
+         parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const PlaceholderScreen(title: 'Create New Order'),
+      ),
+      GoRoute(
+        path: '/invoices/:orderId',
+         parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => InvoiceScreen(orderId: state.pathParameters['orderId']!),
+      ),
+
+      GoRoute(
+        path: '/notifications',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const NotificationListScreen(),
+      ),
+
+      GoRoute(
+        path: '/payment-details/:id',
+        builder: (context, state) => PaymentDetailScreen(paymentId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '/notifications/:id',
+        builder: (context, state) => NotificationDetailScreen(notificationId: state.pathParameters['id']!),
+      ),
+
+      // --- Feature 12: Reports ---
+      GoRoute(
+         path: '/reports',
+         parentNavigatorKey: _rootNavigatorKey,
+         builder: (context, state) => const ReportsHomeScreen(),
+         routes: [
+           GoRoute(
+             path: 'daily',
+             builder: (context, state) => const DailySummaryScreen(),
+           ),
+           GoRoute(
+             path: 'period/:type',
+             builder: (context, state) => PeriodSummaryScreen(periodType: state.pathParameters['type']!),
+           ),
+           GoRoute(
+             path: 'shops',
+             builder: (context, state) => const ShopReportScreen(),
+           ),
+           GoRoute(
+             path: 'products',
+             builder: (context, state) => const ProductReportScreen(),
+           ),
+           GoRoute(
+             path: 'performance',
+             builder: (context, state) => const PerformanceScreen(),
+           ),
+         ]
+      ),
+
+      // --- Feature 12: Reports ---
+      GoRoute(
+         path: '/reports',
+         parentNavigatorKey: _rootNavigatorKey,
+         builder: (context, state) => const ReportsHomeScreen(),
+         routes: [
+           GoRoute(
+             path: 'daily',
+             builder: (context, state) => const DailySummaryScreen(),
+           ),
+           GoRoute(
+             path: 'period/:type',
+             builder: (context, state) => PeriodSummaryScreen(periodType: state.pathParameters['type']!),
+           ),
+           GoRoute(
+             path: 'shops',
+             builder: (context, state) => const ShopReportScreen(),
+           ),
+           GoRoute(
+             path: 'products',
+             builder: (context, state) => const ProductReportScreen(),
+           ),
+           GoRoute(
+             path: 'performance',
+             builder: (context, state) => const PerformanceScreen(),
+           ),
+         ]
       ),
     ],
   );

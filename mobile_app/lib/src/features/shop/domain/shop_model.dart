@@ -7,6 +7,7 @@ class Shop {
   final String mobileNumber;
   final String address;
   final String cityId;
+  final String? gstNumber;
   final ShopStatus status;
 
   Shop({
@@ -16,6 +17,7 @@ class Shop {
     required this.mobileNumber,
     required this.address,
     required this.cityId,
+    this.gstNumber,
     this.status = ShopStatus.active,
   });
 
@@ -26,6 +28,7 @@ class Shop {
     String? mobileNumber,
     String? address,
     String? cityId,
+    String? gstNumber,
     ShopStatus? status,
   }) {
     return Shop(
@@ -35,6 +38,7 @@ class Shop {
       mobileNumber: mobileNumber ?? this.mobileNumber,
       address: address ?? this.address,
       cityId: cityId ?? this.cityId,
+      gstNumber: gstNumber ?? this.gstNumber,
       status: status ?? this.status,
     );
   }

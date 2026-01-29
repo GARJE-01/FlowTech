@@ -1,0 +1,87 @@
+Analyzing mobile_app...                                         
+
+warning - Unused import: '../../features/order/presentation/order_tracking_placeholder_screen.dart' - lib\src\core\router\app_router.dart:19:8 - unused_import
+warning - Duplicate import - lib\src\core\router\app_router.dart:34:8 - duplicate_import
+warning - Duplicate import - lib\src\core\router\app_router.dart:35:8 - duplicate_import
+warning - Duplicate import - lib\src\core\router\app_router.dart:36:8 - duplicate_import
+warning - Duplicate import - lib\src\core\router\app_router.dart:37:8 - duplicate_import
+warning - Duplicate import - lib\src\core\router\app_router.dart:38:8 - duplicate_import
+warning - Duplicate import - lib\src\core\router\app_router.dart:39:8 - duplicate_import
+   info - 'background' is deprecated and shouldn't be used. Use surface instead. This feature was deprecated after v3.18.0-0.1.pre - lib\src\core\theme\app_theme.dart:26:9 - deprecated_member_use
+   info - 'onBackground' is deprecated and shouldn't be used. Use onSurface instead. This feature was deprecated after v3.18.0-0.1.pre - lib\src\core\theme\app_theme.dart:27:9 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\src\features\city\presentation\city_selection_screen.dart:78:66 - deprecated_member_use
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\src\features\city\presentation\city_selection_screen.dart:138:28 - use_build_context_synchronously
+warning - The value of the local variable 'outstandingAmount' isn't used - lib\src\features\dashboard\presentation\dashboard_screen.dart:24:11 - unused_local_variable
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\src\features\dashboard\presentation\dashboard_screen.dart:78:73 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\src\features\dashboard\presentation\dashboard_screen.dart:226:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\src\features\dashboard\presentation\dashboard_screen.dart:244:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\src\features\dashboard\presentation\dashboard_screen.dart:287:59 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\src\features\dashboard\presentation\dashboard_screen.dart:387:37 - deprecated_member_use
+warning - Unused import: 'package:uuid/uuid.dart' - lib\src\features\invoice\data\invoice_service.dart:2:8 - unused_import
+warning - Unused import: '../../order/data/order_service.dart' - lib\src\features\invoice\data\invoice_service.dart:4:8 - unused_import
+warning - Unused import: '../../order/domain/order_item_model.dart' - lib\src\features\invoice\data\pdf_generator_service.dart:6:8 - unused_import
+   info - 'Table.fromTextArray' is deprecated and shouldn't be used. Use TableHelper.fromTextArray() instead - lib\src\features\invoice\data\pdf_generator_service.dart:93:12 - deprecated_member_use
+   info - Unnecessary use of string interpolation - lib\src\features\invoice\data\pdf_generator_service.dart:98:9 - unnecessary_string_interpolations
+   info - Unnecessary use of string interpolation - lib\src\features\invoice\data\pdf_generator_service.dart:99:9 - unnecessary_string_interpolations
+   info - Unnecessary use of string interpolation - lib\src\features\invoice\data\pdf_generator_service.dart:133:17 - unnecessary_string_interpolations
+warning - Unused import: '../../order/domain/order_model.dart' - lib\src\features\invoice\domain\invoice_model.dart:1:8 - unused_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\src\features\invoice\presentation\invoice_screen.dart:59:37 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\src\features\invoice\presentation\invoice_screen.dart:187:49 - deprecated_member_use
+warning - This default clause is covered by the previous cases - lib\src\features\notification\presentation\notification_card_widget.dart:91:7 - unreachable_switch_default
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\src\features\notification\presentation\notification_card_widget.dart:100:22 - deprecated_member_use
+warning - The '!' will have no effect because the receiver can't be null - lib\src\features\notification\presentation\notification_detail_screen.dart:56:43 - unnecessary_non_null_assertion
+warning - This default clause is covered by the previous cases - lib\src\features\notification\presentation\notification_detail_screen.dart:151:7 - unreachable_switch_default
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\src\features\notification\presentation\notification_detail_screen.dart:160:22 - deprecated_member_use
+warning - Unused import: '../../product/domain/product_model.dart' - lib\src\features\order\presentation\cart_review_screen.dart:6:8 - unused_import
+warning - Unused import: '../../shop/data/shop_service.dart' - lib\src\features\order\presentation\cart_review_screen.dart:7:8 - unused_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\src\features\order\presentation\cart_review_screen.dart:46:51 - deprecated_member_use
+   info - Unnecessary use of string interpolation - lib\src\features\order\presentation\cart_review_screen.dart:83:34 - unnecessary_string_interpolations
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\src\features\order\presentation\cart_review_screen.dart:150:39 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\src\features\order\presentation\order_shop_selection_screen.dart:48:69 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\src\features\order_tracking\presentation\order_detail_screen.dart:157:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\src\features\order_tracking\presentation\order_detail_screen.dart:159:60 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\src\features\order_tracking\presentation\order_detail_screen.dart:213:22 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\src\features\order_tracking\presentation\order_list_screen.dart:101:38 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\src\features\order_tracking\presentation\order_list_screen.dart:105:36 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\src\features\order_tracking\presentation\order_list_screen.dart:109:39 - deprecated_member_use
+warning - This default clause is covered by the previous cases - lib\src\features\order_tracking\presentation\order_list_screen.dart:112:7 - unreachable_switch_default
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\src\features\order_tracking\presentation\order_list_screen.dart:114:37 - deprecated_member_use
+warning - Unused import: '../../order/data/order_service.dart' - lib\src\features\payment\data\payment_service.dart:3:8 - unused_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\src\features\payment\presentation\payment_detail_screen.dart:142:46 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\src\features\payment\presentation\payment_list_screen.dart:192:22 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\src\features\payment\presentation\payment_list_screen.dart:194:41 - deprecated_member_use
+  error - The getter 'notifier' isn't defined for the type 'Provider<List<dynamic>>' - lib\src\features\product\presentation\cart_placeholder_screen.dart:12:47 - undefined_getter
+  error - The getter 'notifier' isn't defined for the type 'Provider<List<dynamic>>' - lib\src\features\product\presentation\cart_placeholder_screen.dart:46:56 - undefined_getter
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\src\features\product\presentation\cart_placeholder_screen.dart:61:45 - deprecated_member_use
+warning - Duplicate import - lib\src\features\product\presentation\product_detail_bottom_sheet.dart:7:8 - duplicate_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\src\features\product\presentation\product_detail_bottom_sheet.dart:67:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\src\features\product\presentation\product_detail_bottom_sheet.dart:67:99 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\src\features\product\presentation\product_detail_bottom_sheet.dart:67:131 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\src\features\profile\presentation\profile_screen.dart:39:41 - deprecated_member_use
+warning - Duplicate import - lib\src\features\reports\data\reports_service.dart:9:8 - duplicate_import
+warning - Duplicate import - lib\src\features\reports\data\reports_service.dart:10:8 - duplicate_import
+warning - The value of the local variable 'endOfDay' isn't used - lib\src\features\reports\data\reports_service.dart:25:11 - unused_local_variable
+warning - The value of the local variable 'shops' isn't used - lib\src\features\reports\data\reports_service.dart:242:11 - unused_local_variable
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\src\features\reports\presentation\daily_summary_screen.dart:83:59 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\src\features\reports\presentation\daily_summary_screen.dart:129:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\src\features\reports\presentation\performance_screen.dart:41:50 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\src\features\reports\presentation\performance_screen.dart:47:53 - deprecated_member_use
+warning - Unused import: 'package:lucide_icons/lucide_icons.dart' - lib\src\features\reports\presentation\period_summary_screen.dart:3:8 - unused_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\src\features\reports\presentation\period_summary_screen.dart:141:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\src\features\reports\presentation\product_report_screen.dart:28:68 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\src\features\reports\presentation\reports_home_screen.dart:23:53 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\src\features\reports\presentation\reports_home_screen.dart:25:72 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\src\features\reports\presentation\reports_home_screen.dart:117:32 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\src\features\reports\presentation\reports_home_screen.dart:155:57 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\src\features\reports\presentation\shop_report_screen.dart:30:54 - deprecated_member_use
+warning - Unused import: 'package:shared_preferences/shared_preferences.dart' - lib\src\features\route\data\visit_service.dart:2:8 - unused_import
+warning - This default clause is covered by the previous cases - lib\src\features\route\presentation\route_list_screen.dart:110:7 - unreachable_switch_default
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\src\features\route\presentation\route_list_screen.dart:128:47 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\src\features\route\presentation\route_list_screen.dart:146:49 - deprecated_member_use
+  error - The argument for the named parameter 'padding' was already specified - lib\src\features\route\presentation\visit_action_sheet.dart:18:7 - duplicate_named_argument
+  error - Undefined name 'draftOrderProvider' - lib\src\features\route\presentation\visit_action_sheet.dart:49:24 - undefined_identifier
+warning - Unused import: 'package:uuid/uuid.dart' - lib\src\features\shop\data\shop_service.dart:2:8 - unused_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\src\features\shop\presentation\shop_detail_screen.dart:43:46 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\src\features\shop\presentation\shop_detail_screen.dart:43:76 - deprecated_member_use
+  error - The name 'MyApp' isn't a class - test\widget_test.dart:16:35 - creation_with_non_type
+

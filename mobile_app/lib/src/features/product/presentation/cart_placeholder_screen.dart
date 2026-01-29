@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import '../data/cart_stub_service.dart';
+import '../../order/data/order_service.dart'; // Import OrderService
 
 class CartPlaceholderScreen extends ConsumerWidget {
   const CartPlaceholderScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final cartItems = ref.watch(cartProvider);
-    final totalAmount = ref.read(cartProvider.notifier).totalAmount;
+    // Use draftOrderProvider directly
+    final draftOrder = ref.watch(draftOrderProvider);
+    final cartItems = draftOrder?.items ?? [];
+    final totalAmount = draftOrder?.totalAmount ?? 0.0;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Shopping Cart')),
@@ -34,16 +36,16 @@ class CartPlaceholderScreen extends ConsumerWidget {
                     itemBuilder: (context, index) {
                       final item = cartItems[index];
                       return ListTile(
-                         title: Text(item.product.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                         subtitle: Text('${item.product.unitType} x ${item.quantity}'),
+                         title: Text(item.productName, style: const TextStyle(fontWeight: FontWeight.bold)),
+                         subtitle: Text('${item.unitType} x ${item.quantity}'),
                          trailing: Row(
                            mainAxisSize: MainAxisSize.min,
                            children: [
-                             Text('₹${item.total.toStringAsFixed(0)}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                             Text('₹${item.lineTotal.toStringAsFixed(0)}', style: const TextStyle(fontWeight: FontWeight.bold)),
                              IconButton(
                                icon: const Icon(LucideIcons.trash2, color: Colors.red, size: 18),
                                onPressed: () {
-                                 ref.read(cartProvider.notifier).removeFromCart(item.product.id);
+                                 ref.read(draftOrderProvider.notifier).removeItem(item.productId);
                                },
                              ),
                            ],
@@ -58,7 +60,7 @@ class CartPlaceholderScreen extends ConsumerWidget {
                     color: Colors.white,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: Colors.black.withValues(alpha: 0.05),
                         blurRadius: 10,
                         offset: const Offset(0, -5),
                       ),
@@ -76,4 +78,4 @@ class CartPlaceholderScreen extends ConsumerWidget {
             ),
     );
   }
-}
+} // Correct class end

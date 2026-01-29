@@ -68,6 +68,10 @@ class ShopDetailScreen extends ConsumerWidget {
                     children: [
                        _buildDetailRow(LucideIcons.user, 'Owner', shop.ownerName),
                        const Divider(height: 24),
+                       if (shop.gstNumber != null && shop.gstNumber!.isNotEmpty) ...[
+                          _buildDetailRow(LucideIcons.receipt, 'GST Number', shop.gstNumber!),
+                          const Divider(height: 24),
+                       ],
                        _buildDetailRow(LucideIcons.phone, 'Mobile', shop.mobileNumber),
                        const Divider(height: 24),
                        _buildDetailRow(LucideIcons.mapPin, 'Address', shop.address),

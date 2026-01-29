@@ -1,10 +1,14 @@
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
+import '../../invoice/data/invoice_service.dart'; // Moved to top
 import '../../product/domain/product_model.dart';
 import '../../route/data/visit_service.dart';
 import '../domain/order_model.dart';
 import '../domain/order_item_model.dart';
 import '../../shop/domain/shop_model.dart';
+import '../../notification/data/notification_service.dart';
+import '../../notification/domain/notification_model.dart';
 
 class OrderService extends StateNotifier<List<Order>> {
   final Ref ref;
@@ -150,6 +154,13 @@ class OrderListNotifier extends StateNotifier<List<Order>> {
 
   OrderListNotifier(this.ref) : super([]);
   
+  // Helper to access invoice provider to avoid circular import issues if possible, 
+  // or just use ref.read(invoiceProvider) directly if imported.
+  // The error was 'The getter invoiceProvider isn't defined'.
+  // This is because we are in OrderService and trying to use a global variable 'invoiceProvider' 
+  // which is imported from invoice_service.dart.
+  // We need to make sure invoice_service.dart exposes it.
+  
   void submitOrder(Order draftOrder) {
     // 1. Change status
     final submittedOrder = draftOrder.copyWith(
@@ -164,7 +175,7 @@ class OrderListNotifier extends StateNotifier<List<Order>> {
     ref.read(visitProvider.notifier).markOrderPlaced(draftOrder.shopId);
   }
   // 4. Mock Admin Action
-  void simulateAdminAction(String orderId, bool approve) {
+  void simulateAdminAction(String orderId, bool approve) { 
     state = [
       for (final order in state)
         if (order.id == orderId)
@@ -175,6 +186,31 @@ class OrderListNotifier extends StateNotifier<List<Order>> {
         else
           order
     ];
+    
+    // Auto-generate invoice if approved
+    if (approve) {
+       final approvedOrder = state.firstWhere((o) => o.id == orderId);
+       ref.read(invoiceProvider.notifier).generateInvoiceForOrder(approvedOrder);
+       
+       ref.read(notificationProvider.notifier).addNotification(
+          type: NotificationType.order,
+          title: 'Order Approved',
+          message: 'Order #${approvedOrder.id.substring(0, 4)}... for ${approvedOrder.shopName} has been officially approved.',
+          relatedId: orderId,
+       );
+    } else {
+       final rejectedOrder = state.firstWhere((o) => o.id == orderId); // Get order details for msg
+       ref.read(notificationProvider.notifier).addNotification(
+          type: NotificationType.order,
+          title: 'Order Rejected',
+          message: 'Order #${orderId.substring(0, 4)}... for ${rejectedOrder.shopName} was rejected by admin.',
+          relatedId: orderId,
+       );
+    }
+  }
+
+  Order? getOrderById(String id) {
+    return state.where((o) => o.id == id).firstOrNull;
   }
 }
 

@@ -12,6 +12,7 @@ final _initialShops = [
     mobileNumber: '9876543210',
     address: '123 Market Road',
     cityId: '1', // Mumbai
+    gstNumber: '27AAAAA1111A1Z5',
     status: ShopStatus.active,
   ),
   Shop(
@@ -30,6 +31,7 @@ final _initialShops = [
     mobileNumber: '9898989898',
     address: 'Shop 12, City Mall',
     cityId: '1', // Mumbai
+    gstNumber: '27BBBBB2222B1Z6',
     status: ShopStatus.inactive,
   ),
    Shop(

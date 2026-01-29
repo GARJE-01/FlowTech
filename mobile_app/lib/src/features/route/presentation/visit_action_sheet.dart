@@ -13,7 +13,6 @@ class VisitActionSheet extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Container(
-      padding: const EdgeInsets.all(24),
       // SafeArea for bottom
       padding: EdgeInsets.only(
         left: 24, right: 24, top: 24, 

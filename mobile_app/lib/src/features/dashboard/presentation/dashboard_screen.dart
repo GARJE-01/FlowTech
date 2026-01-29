@@ -4,6 +4,10 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../city/data/city_service.dart';
 import '../../auth/data/auth_service.dart';
+import '../../payment/data/payment_service.dart';
+import '../../payment/domain/payment_model.dart';
+import '../../notification/data/notification_service.dart';
+// import '../../notification/domain/notification_model.dart'; // Already imported via service ideally or explicitly if needed
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -11,7 +15,13 @@ class DashboardScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedCity = ref.watch(cityProvider).selectedCity;
+
     final user = ref.watch(authProvider).user;
+    final payments = ref.watch(paymentProvider);
+    final notifications = ref.watch(notificationProvider);
+    final recentNotifications = notifications.take(3).toList();
+    final pendingPaymentsCount = payments.where((p) => p.status == PaymentStatus.pending).length;
+    final outstandingAmount = payments.fold(0.0, (sum, p) => sum + p.balanceAmount);
 
     return Scaffold(
       backgroundColor: Colors.grey[50], // Light background for contrast
@@ -94,7 +104,7 @@ class DashboardScreen extends ConsumerWidget {
                         _buildSummaryCard(context, 'Total Shops', '25', LucideIcons.store, width),
                         _buildSummaryCard(context, 'Active Shops', '18', LucideIcons.checkCircle, width, color: Colors.green),
                         _buildSummaryCard(context, 'Orders Today', '4', LucideIcons.shoppingBag, width, color: Colors.blue),
-                        _buildSummaryCard(context, 'Pending', '2', LucideIcons.clock, width, color: Colors.orange),
+                        _buildSummaryCard(context, 'Pending Payments', '$pendingPaymentsCount', LucideIcons.indianRupee, width, color: Colors.orange),
                       ],
                     );
                   }
@@ -126,7 +136,9 @@ class DashboardScreen extends ConsumerWidget {
                     _buildActionButton(context, 'Add Shop', LucideIcons.plus, () => context.push('/shops/add')),
                     _buildActionButton(context, 'New Order', LucideIcons.shoppingCart, () => context.push('/order/select-shop')),
                     _buildActionButton(context, 'Orders', LucideIcons.fileText, () => context.push('/orders')),
+                    _buildActionButton(context, 'Payments', LucideIcons.indianRupee, () => context.push('/payments')),
                     _buildActionButton(context, 'Bills', LucideIcons.receipt, () => context.push('/bills')),
+                    _buildActionButton(context, 'Reports', LucideIcons.barChart, () => context.push('/reports'), isPrimary: true),
                   ],
                 ),
               ),
@@ -161,9 +173,13 @@ class DashboardScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              _buildNotificationTile(context, 'Order #1234 Approved', 'Your order for Gupta General Store has been approved.', '2m ago'),
-              _buildNotificationTile(context, 'Price Update', 'Cement bags price updated by admin.', '1h ago'),
-              _buildNotificationTile(context, 'Shop Added', 'New shop "Sharma Hardware" added successfully.', '3h ago'),
+              if (recentNotifications.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Text("No new notifications", style: TextStyle(color: Colors.grey[400], fontStyle: FontStyle.italic)),
+                )
+              else
+                ...recentNotifications.map((n) => _buildNotificationTile(context, n.id, n.title, n.message, _formatTime(n.timestamp))),
 
 
               const SizedBox(height: 24),
@@ -290,9 +306,9 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildNotificationTile(BuildContext context, String title, String subtitle, String time) {
+  Widget _buildNotificationTile(BuildContext context, String id, String title, String subtitle, String time) {
     return InkWell(
-      onTap: () => context.push('/notifications/1'), // Dummy ID
+      onTap: () => context.push('/notifications/$id'),
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         padding: const EdgeInsets.all(12),
@@ -377,5 +393,11 @@ class DashboardScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+  String _formatTime(DateTime time) {
+    final diff = DateTime.now().difference(time);
+    if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
+    if (diff.inHours < 24) return '${diff.inHours}h ago';
+    return '${time.day}/${time.month}';
   }
 }
