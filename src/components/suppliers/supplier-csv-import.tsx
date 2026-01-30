@@ -14,6 +14,14 @@ export function SupplierCSVImport() {
         const file = e.target.files?.[0];
         if (!file) return;
 
+        // Validation: Ensure it's a CSV
+        if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls') || (file.type && !file.type.includes('csv') && !file.type.includes('text'))) {
+            alert("It looks like you uploaded an Excel file (.xlsx/.xls). Please 'Save As' -> 'CSV (Comma delimited)' in Excel and try again.");
+            // Reset input
+            e.target.value = '';
+            return;
+        }
+
         setLoading(true);
         Papa.parse(file, {
             header: true,

@@ -56,4 +56,36 @@ class Order {
       updatedAt: updatedAt ?? this.updatedAt,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'shopId': shopId,
+      'shopName': shopName,
+      'cityId': cityId,
+      'items': items.map((i) => i.toJson()).toList(),
+      'subtotalAmount': subtotalAmount,
+      'gstAmount': gstAmount,
+      'totalAmount': totalAmount,
+      'status': status.index,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt?.toIso8601String(),
+    };
+  }
+
+  factory Order.fromJson(Map<String, dynamic> json) {
+    return Order(
+      id: json['id'],
+      shopId: json['shopId'],
+      shopName: json['shopName'],
+      cityId: json['cityId'],
+      items: (json['items'] as List).map((i) => OrderItem.fromJson(i)).toList(),
+      subtotalAmount: json['subtotalAmount'],
+      gstAmount: json['gstAmount'],
+      totalAmount: json['totalAmount'],
+      status: OrderStatus.values[json['status'] ?? 0],
+      createdAt: DateTime.parse(json['createdAt']),
+      updatedAt: json['updatedAt'] != null ? DateTime.parse(json['updatedAt']) : null,
+    );
+  }
 }

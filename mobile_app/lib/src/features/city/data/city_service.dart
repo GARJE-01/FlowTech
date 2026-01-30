@@ -26,12 +26,19 @@ class CityService extends StateNotifier<CityState> {
 
   // Mock Data
   final List<City> _mockCities = [
-    City(id: '1', name: 'Mumbai'),
-    City(id: '2', name: 'Pune'),
-    City(id: '3', name: 'Nashik'),
-    City(id: '4', name: 'Nagpur'),
-    City(id: '5', name: 'Delhi'),
-    City(id: '6', name: 'Bangalore'),
+    City(id: '1', name: 'Chanderai'),
+    City(id: '2', name: 'Jakadevi'),
+    City(id: '3', name: 'Devrukh'),
+    City(id: '4', name: 'Jaigad'),
+    City(id: '5', name: 'Arvali'),
+    City(id: '6', name: 'Kotawade'),
+    City(id: '7', name: 'Kuvar Bav'),
+    City(id: '8', name: 'Lanja'),
+    City(id: '9', name: 'Nate'),
+    City(id: '10', name: 'Pali'),
+    City(id: '11', name: 'Rajapur'),
+    City(id: '12', name: 'Pawas'),
+    City(id: '13', name: 'Sangmeshwar'),
   ];
 
   Future<void> _loadCitiesAndSelection() async {

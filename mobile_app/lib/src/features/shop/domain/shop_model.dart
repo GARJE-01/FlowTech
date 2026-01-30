@@ -42,4 +42,30 @@ class Shop {
       status: status ?? this.status,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'ownerName': ownerName,
+      'mobileNumber': mobileNumber,
+      'address': address,
+      'cityId': cityId,
+      'gstNumber': gstNumber,
+      'status': status.index,
+    };
+  }
+
+  factory Shop.fromJson(Map<String, dynamic> json) {
+    return Shop(
+      id: json['id'],
+      name: json['name'],
+      ownerName: json['ownerName'],
+      mobileNumber: json['mobileNumber'],
+      address: json['address'],
+      cityId: json['cityId'],
+      gstNumber: json['gstNumber'],
+      status: ShopStatus.values[json['status'] ?? 0],
+    );
+  }
 }

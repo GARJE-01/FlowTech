@@ -101,7 +101,7 @@ class _ShopListScreenState extends ConsumerState<ShopListScreen> with SingleTick
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/shops/add'),
+        onPressed: () => context.push('/add-shop'),
         icon: const Icon(LucideIcons.plus),
         label: const Text('Add Shop'),
       ),

@@ -53,4 +53,30 @@ class Payment {
       lastPaymentMode: lastPaymentMode ?? this.lastPaymentMode,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'paymentId': paymentId,
+      'invoiceId': invoiceId,
+      'shopId': shopId,
+      'shopName': shopName,
+      'totalBillAmount': totalBillAmount,
+      'amountReceived': amountReceived,
+      'lastPaymentDate': lastPaymentDate?.toIso8601String(),
+      'lastPaymentMode': lastPaymentMode?.index,
+    };
+  }
+
+  factory Payment.fromJson(Map<String, dynamic> json) {
+    return Payment(
+      paymentId: json['paymentId'],
+      invoiceId: json['invoiceId'],
+      shopId: json['shopId'],
+      shopName: json['shopName'],
+      totalBillAmount: json['totalBillAmount'],
+      amountReceived: json['amountReceived'],
+      lastPaymentDate: json['lastPaymentDate'] != null ? DateTime.parse(json['lastPaymentDate']) : null,
+      lastPaymentMode: json['lastPaymentMode'] != null ? PaymentMode.values[json['lastPaymentMode']] : null,
+    );
+  }
 }

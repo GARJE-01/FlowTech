@@ -6,8 +6,6 @@ import '../../shop/domain/shop_model.dart';
 import '../../route/data/visit_service.dart'; // Assuming visit service exists or reusing logic
 import '../../route/domain/visit_model.dart';
 import '../../reports/domain/report_models.dart';
-import '../../route/data/visit_service.dart';
-import '../../route/domain/visit_model.dart';
 import '../../city/data/city_service.dart';
 
 final reportsServiceProvider = Provider<ReportsService>((ref) {

@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/storage/storage_service.dart';
 import '../domain/payment_model.dart';
 import '../../order/data/order_service.dart'; // To link with orders if needed or just mock
 import 'dart:math';
@@ -10,9 +11,20 @@ import '../../notification/domain/notification_model.dart';
 
 class PaymentNotifier extends StateNotifier<List<Payment>> {
   final Ref ref;
+  final StorageService _storage;
 
-  PaymentNotifier(this.ref) : super([]) {
-    _initMockData();
+  PaymentNotifier(this.ref, this._storage) : super([]) {
+    _loadPayments();
+  }
+
+  void _loadPayments() {
+    final loaded = _storage.loadPayments();
+    if (loaded.isNotEmpty) {
+      state = loaded;
+    } else {
+      _initMockData();
+      _storage.savePayments(state);
+    }
   }
 
   void _initMockData() {
@@ -75,6 +87,7 @@ class PaymentNotifier extends StateNotifier<List<Payment>> {
         else
           p
     ];
+    _storage.savePayments(state);
     ref.read(notificationProvider.notifier).addNotification(
       type: NotificationType.payment,
       title: 'Payment Received',
@@ -92,9 +105,10 @@ class PaymentNotifier extends StateNotifier<List<Payment>> {
         else
           p
     ];
+    _storage.savePayments(state);
   }
 }
 
 final paymentProvider = StateNotifierProvider<PaymentNotifier, List<Payment>>((ref) {
-  return PaymentNotifier(ref);
+  throw UnimplementedError('StorageService must be overridden in main.dart');
 });

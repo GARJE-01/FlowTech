@@ -9,6 +9,10 @@ import '../../payment/domain/payment_model.dart';
 import '../../notification/data/notification_service.dart';
 // import '../../notification/domain/notification_model.dart'; // Already imported via service ideally or explicitly if needed
 
+import '../../shop/data/shop_service.dart';
+import '../../shop/domain/shop_model.dart';
+import '../../order/data/order_service.dart';
+
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
 
@@ -18,10 +22,25 @@ class DashboardScreen extends ConsumerWidget {
 
     final user = ref.watch(authProvider).user;
     final payments = ref.watch(paymentProvider);
+    final shops = ref.watch(shopProvider);
+    final orders = ref.watch(orderListProvider);
     final notifications = ref.watch(notificationProvider);
+    
     final recentNotifications = notifications.take(3).toList();
+    
+    // Calculate Stats
+    final totalShops = shops.length;
+    final activeShops = shops.where((s) => s.status == ShopStatus.active).length;
+    
+    final today = DateTime.now();
+    final ordersToday = orders.where((o) => 
+      o.createdAt.year == today.year && 
+      o.createdAt.month == today.month && 
+      o.createdAt.day == today.day
+    ).length;
+
     final pendingPaymentsCount = payments.where((p) => p.status == PaymentStatus.pending).length;
-    final outstandingAmount = payments.fold(0.0, (sum, p) => sum + p.balanceAmount);
+    // final outstandingAmount = payments.fold(0.0, (sum, p) => sum + p.balanceAmount);
 
     return Scaffold(
       backgroundColor: Colors.grey[50], // Light background for contrast
@@ -101,9 +120,9 @@ class DashboardScreen extends ConsumerWidget {
                       spacing: 16,
                       runSpacing: 16,
                       children: [
-                        _buildSummaryCard(context, 'Total Shops', '25', LucideIcons.store, width),
-                        _buildSummaryCard(context, 'Active Shops', '18', LucideIcons.checkCircle, width, color: Colors.green),
-                        _buildSummaryCard(context, 'Orders Today', '4', LucideIcons.shoppingBag, width, color: Colors.blue),
+                        _buildSummaryCard(context, 'Total Shops', '$totalShops', LucideIcons.store, width),
+                        _buildSummaryCard(context, 'Active Shops', '$activeShops', LucideIcons.checkCircle, width, color: Colors.green),
+                        _buildSummaryCard(context, 'Orders Today', '$ordersToday', LucideIcons.shoppingBag, width, color: Colors.blue),
                         _buildSummaryCard(context, 'Pending Payments', '$pendingPaymentsCount', LucideIcons.indianRupee, width, color: Colors.orange),
                       ],
                     );
@@ -196,14 +215,26 @@ class DashboardScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              ListView.separated(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: 5,
-                separatorBuilder: (_, __) => const SizedBox(height: 8),
-                itemBuilder: (context, index) => _buildShopTile(context, index),
-              ),
+              if (shops.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Text("No shops added yet", style: TextStyle(color: Colors.grey[400], fontStyle: FontStyle.italic)),
+                )
+              else
+                ListView.separated(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: shops.take(5).length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 8),
+                  itemBuilder: (context, index) {
+                     // Show most recent first (assuming end of list is unexpected, we might want to reverse or sort. 
+                     // But Standard Add puts at end. Let's reverse to show newest first.)
+                     final reversedIndex = shops.length - 1 - index;
+                     final shop = shops[reversedIndex];
+                     return _buildShopTile(context, shop, index); // index here is just for route if needed, but shop object is better
+                  },
+                ),
               
               const SizedBox(height: 32),
             ],
@@ -347,12 +378,13 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildShopTile(BuildContext context, int index) {
-      final names = ['Gupta General Store', 'Sharma Hardware', 'Laxmi Electronics', 'Patil Traders', 'City Supermarket'];
-      final owners = ['Ramesh Gupta', 'Suresh Sharma', 'Vijay Laxmi', 'Anil Patil', 'Rahul City'];
-      
+  Widget _buildShopTile(BuildContext context, Shop shop, int index) {
     return InkWell(
-      onTap: () => context.push('/shops/$index'),
+      onTap: () => context.push('/shops/${shop.id}'), // Assuming route uses ID, originally it was index. Check router.
+      // If router uses index, we might default to that, but ID is better. 
+      // Checking router later. For now assuming ID is safer or we pass the shop object via extra. 
+      // Actually original code was: context.push('/shops/$index');
+      // If standard is ID, we should use ID.
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -369,26 +401,36 @@ class DashboardScreen extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               alignment: Alignment.center,
-              child: Text(names[index][0], style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black54)),
+              child: Text(shop.name.isNotEmpty ? shop.name[0] : '?', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black54)),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(names[index], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                  Text(owners[index], style: TextStyle(color: Colors.grey[500], fontSize: 12)),
+                  Text(shop.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                  Text(shop.ownerName, style: TextStyle(color: Colors.grey[500], fontSize: 12)),
                 ],
               ),
             ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: Colors.green.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(4),
+            if (shop.status == ShopStatus.active)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.green.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Text('Active', style: TextStyle(fontSize: 10, color: Colors.green, fontWeight: FontWeight.bold)),
+              )
+            else
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.red.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Text('Inactive', style: TextStyle(fontSize: 10, color: Colors.red, fontWeight: FontWeight.bold)),
               ),
-              child: const Text('Active', style: TextStyle(fontSize: 10, color: Colors.green, fontWeight: FontWeight.bold)),
-            ),
           ],
         ),
       ),

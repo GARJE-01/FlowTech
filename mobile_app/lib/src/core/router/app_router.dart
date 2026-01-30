@@ -31,12 +31,6 @@ import '../../features/reports/presentation/period_summary_screen.dart';
 import '../../features/reports/presentation/shop_report_screen.dart';
 import '../../features/reports/presentation/product_report_screen.dart';
 import '../../features/reports/presentation/performance_screen.dart';
-import '../../features/reports/presentation/reports_home_screen.dart';
-import '../../features/reports/presentation/daily_summary_screen.dart';
-import '../../features/reports/presentation/period_summary_screen.dart';
-import '../../features/reports/presentation/shop_report_screen.dart';
-import '../../features/reports/presentation/product_report_screen.dart';
-import '../../features/reports/presentation/performance_screen.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
@@ -168,7 +162,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       
       // --- Full Screen Routes (Outside Shell) ---
       GoRoute(
-        path: '/shops/add',
+        path: '/add-shop',
         parentNavigatorKey: _rootNavigatorKey, 
         builder: (context, state) => const AddShopScreen(),
       ),
@@ -203,36 +197,6 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => NotificationDetailScreen(notificationId: state.pathParameters['id']!),
       ),
 
-      // --- Feature 12: Reports ---
-      GoRoute(
-         path: '/reports',
-         parentNavigatorKey: _rootNavigatorKey,
-         builder: (context, state) => const ReportsHomeScreen(),
-         routes: [
-           GoRoute(
-             path: 'daily',
-             builder: (context, state) => const DailySummaryScreen(),
-           ),
-           GoRoute(
-             path: 'period/:type',
-             builder: (context, state) => PeriodSummaryScreen(periodType: state.pathParameters['type']!),
-           ),
-           GoRoute(
-             path: 'shops',
-             builder: (context, state) => const ShopReportScreen(),
-           ),
-           GoRoute(
-             path: 'products',
-             builder: (context, state) => const ProductReportScreen(),
-           ),
-           GoRoute(
-             path: 'performance',
-             builder: (context, state) => const PerformanceScreen(),
-           ),
-         ]
-      ),
-
-      // --- Feature 12: Reports ---
       GoRoute(
          path: '/reports',
          parentNavigatorKey: _rootNavigatorKey,

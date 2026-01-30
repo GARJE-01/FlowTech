@@ -1,0 +1,36 @@
+Resolving dependencies...
+Downloading packages...
+  characters 1.4.0 (1.4.1 available)
+  flutter_lints 3.0.2 (6.0.0 available)
+  flutter_riverpod 2.6.1 (3.2.0 available)
+  go_router 13.2.5 (17.0.1 available)
+  google_fonts 6.3.3 (8.0.0 available)
+  image 4.5.4 (4.7.2 available)
+  intl 0.19.0 (0.20.2 available)
+  lints 3.0.0 (6.0.0 available)
+  matcher 0.12.17 (0.12.18 available)
+  material_color_utilities 0.11.1 (0.13.0 available)
+  meta 1.17.0 (1.18.1 available)
+  objective_c 9.2.4 (9.2.5 available)
+  riverpod 2.6.1 (3.2.0 available)
+  test_api 0.7.7 (0.7.9 available)
+Got dependencies!
+14 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+00:00 +0: loading C:/Users/adity/Flowtech1/mobile_app/test/storage_test.dart
+test/storage_test.dart:55:32: Error: The method 'overrideWithValue' isn't defined for the type 'FutureProvider<StorageService>'.
+ - 'FutureProvider' is from 'package:riverpod/src/future_provider.dart' ('../../AppData/Local/Pub/Cache/hosted/pub.dev/riverpod-2.6.1/lib/src/future_provider.dart').
+ - 'StorageService' is from 'package:flowtech_salesman/src/core/storage/storage_service.dart' ('lib/src/core/storage/storage_service.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'overrideWithValue'.
+        storageServiceProvider.overrideWithValue(AsyncValue.data(storage)),
+                               ^^^^^^^^^^^^^^^^^
+00:00 +0 -1: loading C:/Users/adity/Flowtech1/mobile_app/test/storage_test.dart [E]
+  Failed to load "C:/Users/adity/Flowtech1/mobile_app/test/storage_test.dart":
+  Compilation failed for testPath=C:/Users/adity/Flowtech1/mobile_app/test/storage_test.dart: test/storage_test.dart:55:32: Error: The method 'overrideWithValue' isn't defined for the type 'FutureProvider<StorageService>'.
+   - 'FutureProvider' is from 'package:riverpod/src/future_provider.dart' ('../../AppData/Local/Pub/Cache/hosted/pub.dev/riverpod-2.6.1/lib/src/future_provider.dart').
+   - 'StorageService' is from 'package:flowtech_salesman/src/core/storage/storage_service.dart' ('lib/src/core/storage/storage_service.dart').
+  Try correcting the name to the name of an existing method, or defining a method named 'overrideWithValue'.
+          storageServiceProvider.overrideWithValue(AsyncValue.data(storage)),
+                                 ^^^^^^^^^^^^^^^^^
+  .
+00:00 +0 -1: Some tests failed.

@@ -31,4 +31,24 @@ class OrderItem {
       quantity: quantity ?? this.quantity,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'productId': productId,
+      'productName': productName,
+      'unitType': unitType,
+      'pricePerUnit': pricePerUnit,
+      'quantity': quantity,
+    };
+  }
+
+  factory OrderItem.fromJson(Map<String, dynamic> json) {
+    return OrderItem(
+      productId: json['productId'],
+      productName: json['productName'],
+      unitType: json['unitType'],
+      pricePerUnit: json['pricePerUnit'].toDouble(),
+      quantity: json['quantity'],
+    );
+  }
 }

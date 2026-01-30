@@ -72,47 +72,44 @@ class _CitySelectionScreenState extends ConsumerState<CitySelectionScreen> {
                           });
                         },
                         child: Container(
-                          padding: const EdgeInsets.all(16),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12), // Reduced padding
                           decoration: BoxDecoration(
                             color: isSelected
-                                ? Theme.of(context).primaryColor.withOpacity(0.05)
+                                ? Theme.of(context).primaryColor.withValues(alpha: 0.05)
                                 : Theme.of(context).cardColor,
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(8), // Slightly smaller radius
                             border: Border.all(
                               color: isSelected
                                   ? Theme.of(context).primaryColor
                                   : Colors.grey[300]!,
-                              width: isSelected ? 2 : 1,
+                              width: isSelected ? 1.5 : 1,
                             ),
                           ),
                           child: Row(
                             children: [
                               Icon(
                                 LucideIcons.mapPin,
+                                size: 18, // Smaller icon
                                 color: isSelected
                                     ? Theme.of(context).primaryColor
                                     : Colors.grey,
                               ),
-                              const SizedBox(width: 16),
+                              const SizedBox(width: 12),
                               Expanded(
                                 child: Text(
                                   city.name,
-                                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  style: Theme.of(context).textTheme.bodyLarge?.copyWith( // Smaller text style
                                         fontWeight:
-                                            isSelected ? FontWeight.bold : FontWeight.normal,
+                                            isSelected ? FontWeight.bold : FontWeight.w500,
                                       ),
                                 ),
                               ),
                               if (isSelected)
                                 Icon(
                                   LucideIcons.checkCircle,
+                                  size: 18, // Smaller check icon
                                   color: Theme.of(context).primaryColor,
                                 )
-                              else
-                                const Icon(
-                                  LucideIcons.circle,
-                                  color: Colors.grey,
-                                ),
                             ],
                           ),
                         ),

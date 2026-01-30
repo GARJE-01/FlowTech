@@ -3,7 +3,7 @@ import { db } from "@/db";
 import { suppliers } from "@/db/schema";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { AddSupplierDialog } from "@/components/suppliers/add-supplier-dialog";
+import { SupplierDialog } from "@/components/suppliers/supplier-dialog";
 import { SupplierCSVImport } from "@/components/suppliers/supplier-csv-import";
 
 export default async function SuppliersPage() {
@@ -15,7 +15,7 @@ export default async function SuppliersPage() {
                 <h1 className="text-3xl font-bold tracking-tight">Suppliers</h1>
                 <div className="flex gap-2">
                     <SupplierCSVImport />
-                    <AddSupplierDialog />
+                    <SupplierDialog />
                 </div>
             </div>
 
@@ -42,7 +42,7 @@ export default async function SuppliersPage() {
                                     <TableCell>{supplier.email || "-"}</TableCell>
                                     <TableCell>{supplier.phone || "-"}</TableCell>
                                     <TableCell className="text-right">
-                                        {/* Actions like Edit/Delete */}
+                                        <SupplierDialog supplier={supplier} />
                                     </TableCell>
                                 </TableRow>
                             ))}

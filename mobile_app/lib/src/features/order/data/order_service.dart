@@ -1,6 +1,7 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
+import '../../../core/storage/storage_service.dart';
 import '../../invoice/data/invoice_service.dart'; // Moved to top
 import '../../product/domain/product_model.dart';
 import '../../route/data/visit_service.dart';
@@ -151,16 +152,18 @@ final draftOrderProvider = StateNotifierProvider<DraftOrderNotifier, Order?>((re
 // 2. All Orders Manager (Persisted List)
 class OrderListNotifier extends StateNotifier<List<Order>> {
   final Ref ref;
+  final StorageService _storage;
 
-  OrderListNotifier(this.ref) : super([]);
+  OrderListNotifier(this.ref, this._storage) : super([]) {
+    _loadOrders();
+  }
   
-  // Helper to access invoice provider to avoid circular import issues if possible, 
-  // or just use ref.read(invoiceProvider) directly if imported.
-  // The error was 'The getter invoiceProvider isn't defined'.
-  // This is because we are in OrderService and trying to use a global variable 'invoiceProvider' 
-  // which is imported from invoice_service.dart.
-  // We need to make sure invoice_service.dart exposes it.
-  
+  void _loadOrders() {
+    state = _storage.loadOrders();
+    // Sort by recent first ??
+    state.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+  }
+
   void submitOrder(Order draftOrder) {
     // 1. Change status
     final submittedOrder = draftOrder.copyWith(
@@ -170,6 +173,7 @@ class OrderListNotifier extends StateNotifier<List<Order>> {
 
     // 2. Add to list
     state = [submittedOrder, ...state];
+    _storage.saveOrders(state);
 
     // 3. Update Visit Status
     ref.read(visitProvider.notifier).markOrderPlaced(draftOrder.shopId);
@@ -186,6 +190,7 @@ class OrderListNotifier extends StateNotifier<List<Order>> {
         else
           order
     ];
+    _storage.saveOrders(state);
     
     // Auto-generate invoice if approved
     if (approve) {
@@ -215,5 +220,9 @@ class OrderListNotifier extends StateNotifier<List<Order>> {
 }
 
 final orderListProvider = StateNotifierProvider<OrderListNotifier, List<Order>>((ref) {
-  return OrderListNotifier(ref);
+  // throw UnimplementedError('StorageService must be overridden');
+  // Temporary workaround until main.dart is updated, but ideally this should fail if not overridden
+  // But wait, we can't easily access the overridden value here if we don't know it's injected.
+  // We will count on the main.dart override.
+  throw UnimplementedError('StorageService must be overridden in main.dart');
 });
