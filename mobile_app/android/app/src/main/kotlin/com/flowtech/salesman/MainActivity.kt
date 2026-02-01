@@ -1,4 +1,4 @@
-package com.example.flowtech_salesman
+package com.flowtech.salesman
 
 import io.flutter.embedding.android.FlutterActivity
 
