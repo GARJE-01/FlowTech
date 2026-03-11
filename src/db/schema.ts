@@ -11,7 +11,10 @@ export const user = pgTable("user", {
     createdAt: timestamp('created_at').notNull(),
     updatedAt: timestamp('updated_at').notNull(),
     role: text("role").default("salesman"), // admin, salesman, delivery
+    phoneNumber: text("phone_number"),
+    area: text("area"),
 });
+
 
 export const session = pgTable("session", {
     id: text("id").primaryKey(),
@@ -128,5 +131,16 @@ export const supplierProducts = pgTable("supplier_products", {
     id: serial("id").primaryKey(),
     supplierId: integer("supplier_id").references(() => suppliers.id, { onDelete: 'cascade' }).notNull(),
     productId: integer("product_id").references(() => products.id, { onDelete: 'cascade' }).notNull(),
+});
+
+export const notifications = pgTable("notifications", {
+    id: text("id").primaryKey(), // Using uuid or text identifiers
+    salesmanId: text("salesman_id").references(() => user.id, { onDelete: 'cascade' }).notNull(),
+    type: text("type").notNull(), // 'system', 'order', 'payment', 'inventory'
+    title: text("title").notNull(),
+    message: text("message").notNull(),
+    relatedId: text("related_id"), // e.g., orderId
+    isNew: boolean("is_new").default(true).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

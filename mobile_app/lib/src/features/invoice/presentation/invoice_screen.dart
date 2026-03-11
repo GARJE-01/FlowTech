@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
-import '../domain/invoice_model.dart';
-import '../data/invoice_service.dart';
+import '../../order/data/order_service.dart';
+import '../../order/domain/order_model.dart';
 import '../../payment/data/payment_service.dart';
 import 'package:go_router/go_router.dart';
 
@@ -14,9 +14,10 @@ class InvoiceScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final invoice = ref.watch(invoiceProvider.notifier).getInvoiceByOrderId(orderId);
+    final allOrders = ref.watch(orderListProvider);
+    final Order? order = allOrders.where((o) => o.id == orderId).firstOrNull;
 
-    if (invoice == null) {
+    if (order == null || order.status != OrderStatus.approved) {
       return Scaffold(
         appBar: AppBar(title: const Text('Invoice')),
         body: const Center(child: Text('Invoice not found or not generated yet.')),
@@ -30,19 +31,21 @@ class InvoiceScreen extends ConsumerWidget {
           IconButton(
             icon: const Icon(LucideIcons.share2),
             onPressed: () {
-               _showShareOptions(context, ref, invoice);
+               // Mock share implementation -> Could pass order to a new orderShareProvider
+               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Share functionality coming soon')));
+               // _showShareOptions(context, ref, order);
             },
           ),
           IconButton(
             icon: const Icon(LucideIcons.indianRupee),
             tooltip: 'View Payment Status',
             onPressed: () {
-               final payment = ref.read(paymentProvider.notifier).getPaymentByInvoice(invoice.invoiceId);
+               // We would look up payment by order.id ideally, but for now mock navigation
+               final payment = ref.read(paymentProvider).where((p) => p.invoiceId == order.id).firstOrNull;
                if (payment != null) {
                  context.push('/payment-details/${payment.paymentId}');
                } else {
-                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No payment record found for this invoice (Mock Data mismatch)')));
-                 // Fallback for demo: Go to list
+                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No payment record found for this order')));
                  context.push('/payments'); 
                }
             },
@@ -89,8 +92,8 @@ class InvoiceScreen extends ConsumerWidget {
                       children: [
                         const Text('INVOICE', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 2, color: Colors.grey)),
                         const SizedBox(height: 8),
-                        Text('# ${invoice.invoiceId}', style: const TextStyle(fontWeight: FontWeight.bold)),
-                        Text('Date: ${DateFormat('dd-MM-yyyy').format(invoice.invoiceDate)}', style: const TextStyle(fontSize: 12)),
+                        Text('# ...${order.id.substring(order.id.length - 6)}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                        Text('Date: ${DateFormat('dd-MM-yyyy').format(order.createdAt)}', style: const TextStyle(fontSize: 12)),
                       ],
                     ),
                   ],
@@ -110,9 +113,9 @@ class InvoiceScreen extends ConsumerWidget {
                         children: [
                           const Text('BILL TO:', style: TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.bold)),
                           const SizedBox(height: 4),
-                          Text(invoice.shopName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                          Text(invoice.shopAddress, style: const TextStyle(fontSize: 12)),
-                          Text('GSTIN: ${invoice.shopGST}', style: const TextStyle(fontSize: 12)),
+                          Text(order.shopName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                          const Text('Address not provided', style: TextStyle(fontSize: 12)),
+                          const Text('GSTIN: N/A', style: TextStyle(fontSize: 12)),
                         ],
                       ),
                     ),
@@ -122,8 +125,8 @@ class InvoiceScreen extends ConsumerWidget {
                         children: [
                           const Text('DETAILS:', style: TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.bold)),
                           const SizedBox(height: 4),
-                          Text('Order ID: ...${invoice.orderId.substring(invoice.orderId.length - 6)}', style: const TextStyle(fontSize: 12)),
-                          Text('Salesman: ${invoice.salesmanName}', style: const TextStyle(fontSize: 12)),
+                          Text('Order ID: ...${order.id.substring(order.id.length - 6)}', style: const TextStyle(fontSize: 12)),
+                          const Text('Salesman: User', style: TextStyle(fontSize: 12)),
                           const Text('Terms: Credit (7 Days)', style: TextStyle(fontSize: 12)),
                         ],
                       ),
@@ -152,7 +155,7 @@ class InvoiceScreen extends ConsumerWidget {
                          Padding(padding: EdgeInsets.only(bottom: 8), child: Text('TOTAL', textAlign: TextAlign.right, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
                        ]
                     ),
-                    ...invoice.items.map((item) => TableRow(
+                    ...order.items.map((item) => TableRow(
                       children: [
                         Padding(padding: const EdgeInsets.symmetric(vertical: 4), child: Text(item.productName, style: const TextStyle(fontSize: 12))),
                         Padding(padding: const EdgeInsets.symmetric(vertical: 4), child: Text('${item.quantity}', textAlign: TextAlign.center, style: const TextStyle(fontSize: 12))),
@@ -172,22 +175,22 @@ class InvoiceScreen extends ConsumerWidget {
                   children: [
                     Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                       const Text('Subtotal:', style: TextStyle(fontSize: 12)),
-                      Text('₹${invoice.subtotal.toStringAsFixed(2)}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                      Text('₹${order.subtotalAmount.toStringAsFixed(2)}', style: const TextStyle(fontWeight: FontWeight.bold)),
                     ]),
                     const SizedBox(height: 4),
                     Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                       const Text('CGST (9%):', style: TextStyle(fontSize: 12)),
-                      Text('₹${(invoice.gstAmount / 2).toStringAsFixed(2)}', style: const TextStyle(fontSize: 12)),
+                      Text('₹${(order.gstAmount / 2).toStringAsFixed(2)}', style: const TextStyle(fontSize: 12)),
                     ]),
                      Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                       const Text('SGST (9%):', style: TextStyle(fontSize: 12)),
-                      Text('₹${(invoice.gstAmount / 2).toStringAsFixed(2)}', style: const TextStyle(fontSize: 12)),
+                      Text('₹${(order.gstAmount / 2).toStringAsFixed(2)}', style: const TextStyle(fontSize: 12)),
                     ]),
                     const SizedBox(height: 12),
                     Divider(color: Colors.black.withOpacity(0.5)),
                     Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                       const Text('GRAND TOTAL', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                      Text('₹${invoice.grandTotal.toStringAsFixed(0)}', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Theme.of(context).primaryColor)),
+                      Text('₹${order.totalAmount.toStringAsFixed(0)}', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Theme.of(context).primaryColor)),
                     ]),
                   ],
                 ),
@@ -213,40 +216,5 @@ class InvoiceScreen extends ConsumerWidget {
     );
   }
 
-  void _showShareOptions(BuildContext context, WidgetRef ref, Invoice invoice) {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-           children: [
-             const Text('Share Invoice', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-             const SizedBox(height: 16),
-             ListTile(
-               leading: const Icon(LucideIcons.fileText),
-               title: const Text('Share as PDF'),
-               onTap: () async {
-                 Navigator.pop(context);
-                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Generating PDF...')));
-                 await ref.read(invoiceShareProvider).shareInvoicePdf(invoice);
-                 if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Invoice shared successfully (Mock)')));
-               },
-             ),
-             ListTile(
-               leading: const Icon(LucideIcons.image),
-               title: const Text('Share as Image'),
-                onTap: () async {
-                 Navigator.pop(context);
-                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Generating Image...')));
-                 await ref.read(invoiceShareProvider).shareInvoiceImage(invoice);
-                 if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Invoice shared successfully (Mock)')));
-               },
-             ),
-           ],
-        ),
-      ),
-    );
-  }
+// Placeholder for _showShareOptions if implemented later
 }

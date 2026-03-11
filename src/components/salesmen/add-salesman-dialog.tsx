@@ -24,6 +24,8 @@ export function AddSalesmanDialog() {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState("");
+    const [area, setArea] = useState("");
 
     const handleSubmit = async () => {
         setLoading(true);
@@ -31,16 +33,21 @@ export function AddSalesmanDialog() {
             const res = await addSalesman({
                 name,
                 email,
-                password
+                password,
+                phoneNumber,
+                area
             });
             if (res.success) {
                 setOpen(false);
                 setName("");
                 setEmail("");
                 setPassword("");
+                setPhoneNumber("");
+                setArea("");
             } else {
                 alert(res.error);
             }
+
 
         } catch (e) {
             alert("Failed to add salesman");
@@ -74,7 +81,16 @@ export function AddSalesmanDialog() {
                         <Label>Password</Label>
                         <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="******" />
                     </div>
+                    <div className="grid gap-2">
+                        <Label>Phone Number</Label>
+                        <Input value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} placeholder="+91 9876543210" />
+                    </div>
+                    <div className="grid gap-2">
+                        <Label>Area / Region</Label>
+                        <Input value={area} onChange={(e) => setArea(e.target.value)} placeholder="Mumbai North" />
+                    </div>
                 </div>
+
                 <DialogFooter>
                     <Button onClick={handleSubmit} disabled={loading}>
                         {loading ? "Creating..." : "Create Account"}

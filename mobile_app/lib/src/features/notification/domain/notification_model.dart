@@ -39,4 +39,25 @@ class NotificationModel {
       isNew: isNew ?? this.isNew,
     );
   }
+
+  factory NotificationModel.fromJson(Map<String, dynamic> json) {
+    NotificationType parsedType = NotificationType.system;
+    
+    switch (json['type']) {
+      case 'order': parsedType = NotificationType.order; break;
+      case 'payment': parsedType = NotificationType.payment; break;
+      case 'shop': parsedType = NotificationType.shop; break;
+      default: parsedType = NotificationType.system; break;
+    }
+
+    return NotificationModel(
+      id: json['id'],
+      type: parsedType,
+      title: json['title'],
+      message: json['message'],
+      relatedId: json['related_id'],
+      timestamp: DateTime.parse(json['createdAt'] ?? json['created_at']),
+      isNew: json['isNew'] ?? json['is_new'] ?? true,
+    );
+  }
 }

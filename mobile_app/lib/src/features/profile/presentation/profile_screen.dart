@@ -80,17 +80,18 @@ class ProfileScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'ID: ${user.employeeId}',
+                    'ID: ${user.id.substring(0, 8)}',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: Colors.grey[600],
                         ),
                   ),
                   Text(
-                    user.contact,
+                    user.email,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: Colors.grey[600],
                         ),
                   ),
+
                 ],
               ),
             ),
@@ -98,9 +99,12 @@ class ProfileScreen extends ConsumerWidget {
 
             // Info Sections
             _buildInfoSection(context, 'Account Info', [
-              _buildListTile(context, LucideIcons.mapPin, 'Region', 'North Zone (Mumbai)'),
-              _buildListTile(context, LucideIcons.mail, 'Email', 'salesman@flowtech.agency'),
+              _buildListTile(context, LucideIcons.mapPin, 'Region', user.area ?? 'Not Assigned'),
+              _buildListTile(context, LucideIcons.phone, 'Phone', user.phoneNumber ?? 'Not Added'),
+              _buildListTile(context, LucideIcons.mail, 'Email', user.email),
             ]),
+
+
             
             const SizedBox(height: 24),
 

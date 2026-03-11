@@ -55,12 +55,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
               // Form Section
               TextField(
-                controller: _usernameController,
+                controller: _usernameController, // Kept internal name for now
                 decoration: const InputDecoration(
-                  labelText: 'Username / Mobile Number',
-                  prefixIcon: Icon(LucideIcons.user),
+                  labelText: 'Email Address',
+                  prefixIcon: Icon(LucideIcons.mail),
                 ),
               ),
+
               const SizedBox(height: 16),
               TextField(
                 controller: _passwordController,

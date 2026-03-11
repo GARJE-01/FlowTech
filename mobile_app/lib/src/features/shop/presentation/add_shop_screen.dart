@@ -45,12 +45,9 @@ class _AddShopScreenState extends ConsumerState<AddShopScreen> {
 
       setState(() => _isLoading = true);
 
-      // Simulate a small delay for UX
-      Future.delayed(const Duration(milliseconds: 500), () {
-        if (!mounted) return;
-
+      Future.microtask(() async {
         final newShop = Shop(
-          id: const Uuid().v4(),
+          id: const Uuid().v4(), // API backend will replace this ID
           name: _nameController.text.trim(),
           ownerName: _ownerController.text.trim(),
           mobileNumber: _mobileController.text.trim(),
@@ -60,18 +57,31 @@ class _AddShopScreenState extends ConsumerState<AddShopScreen> {
           status: ShopStatus.active,
         );
 
-        ref.read(shopProvider.notifier).addShop(newShop);
+        final success = await ref.read(shopProvider.notifier).addShop(newShop);
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Shop "${newShop.name}" added successfully!'),
-            backgroundColor: Colors.green,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        if (!mounted) return;
+        
+        setState(() => _isLoading = false);
 
-        context.pop();
+        if (success) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Shop "${newShop.name}" added successfully!'),
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+          context.pop();
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+             const SnackBar(
+               content: Text('Failed to sync shop with server. Please try again.'),
+               backgroundColor: Colors.red,
+            ),
+          );
+        }
       });
+
     }
   }
 

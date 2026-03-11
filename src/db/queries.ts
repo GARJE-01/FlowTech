@@ -68,6 +68,8 @@ export async function getOrder(id: string) {
         createdAt: orders.createdAt,
         salesmanName: user.name,
         shopName: shops.shopName,
+        shopAddress: shops.address,
+        shopGST: shops.gstNumber,
     })
         .from(orders)
         .leftJoin(user, eq(orders.salesmanId, user.id))

@@ -6,6 +6,8 @@ import 'src/core/storage/storage_service.dart';
 import 'src/features/shop/data/shop_service.dart';
 import 'src/features/order/data/order_service.dart';
 import 'src/features/payment/data/payment_service.dart';
+import 'src/features/product/data/product_service.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,10 +16,13 @@ void main() async {
   runApp(ProviderScope(
     overrides: [
       storageServiceProvider.overrideWith((ref) => storageService),
-      shopProvider.overrideWith((ref) => ShopService(storageService)),
+      shopProvider.overrideWith((ref) => ShopService(storageService, ref)),
       orderListProvider.overrideWith((ref) => OrderListNotifier(ref, storageService)),
+
       paymentProvider.overrideWith((ref) => PaymentNotifier(ref, storageService)),
+      productProvider.overrideWith((ref) => ProductService(storageService)),
     ],
+
     child: const FlowTechApp(),
   ));
 }

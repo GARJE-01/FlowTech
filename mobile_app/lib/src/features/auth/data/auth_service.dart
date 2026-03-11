@@ -1,23 +1,47 @@
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import '../../../core/network/api_client.dart';
+import '../../../core/network/sync_service.dart';
 
 // --- Domain ---
 class User {
   final String id;
   final String name;
   final String role;
-  final String employeeId;
-  final String contact;
+  final String email;
+  final String? phoneNumber;
+  final String? area;
 
   User({
     required this.id,
     required this.name,
     required this.role,
-    required this.employeeId,
-    required this.contact,
+    required this.email,
+    this.phoneNumber,
+    this.area,
   });
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'name': name,
+    'role': role,
+    'email': email,
+    'phoneNumber': phoneNumber,
+    'area': area,
+  };
+
+  factory User.fromJson(Map<String, dynamic> json) => User(
+    id: json['id'],
+    name: json['name'],
+    role: json['role'],
+    email: json['email'],
+    phoneNumber: json['phoneNumber'],
+    area: json['area'],
+  );
 }
+
 
 // --- State ---
 class AuthState {
@@ -31,10 +55,11 @@ class AuthState {
 }
 
 // --- Service / Controller ---
-// --- Service / Controller ---
-
 class AuthService extends StateNotifier<AuthState> {
-  AuthService() : super(AuthState()) {
+  final ApiClient _apiClient;
+  final Ref _ref;
+
+  AuthService(this._apiClient, this._ref) : super(AuthState()) {
     _loadSession();
   }
 
@@ -44,51 +69,38 @@ class AuthService extends StateNotifier<AuthState> {
     
     if (storedUser != null) {
       try {
-        final Map<String, dynamic> userData = jsonDecode(storedUser);
-         final user = User(
-          id: userData['id'],
-          name: userData['name'],
-          role: userData['role'],
-          employeeId: userData['employeeId'],
-          contact: userData['contact'],
-        );
+        final user = User.fromJson(jsonDecode(storedUser));
         state = AuthState(user: user);
+        // Optional: Trigger sync on resume
+        _ref.read(syncServiceProvider).performFullSync();
       } catch (e) {
         state = AuthState(); // Fallback if corrupt
       }
     }
   }
 
-  Future<void> login(String username, String password) async {
+  Future<void> login(String email, String password) async {
     state = AuthState(isLoading: true);
     
-    // Simulate API delay
-    await Future.delayed(const Duration(seconds: 1));
+    final result = await _apiClient.post("/auth/login", {
+      "email": email,
+      "password": password,
+    });
 
-    if (username.isNotEmpty && password.isNotEmpty) {
-      // Mock Success
-      final dummyUser = User(
-        id: 'user_001',
-        name: 'Aditya Salesman',
-        role: 'Salesman',
-        employeeId: 'EMP-1234',
-        contact: '+91 98765 43210',
-      );
+    if (result['success'] == true) {
+      final userData = result['user'];
+      final user = User.fromJson(userData);
       
       // Persist
       final prefs = await SharedPreferences.getInstance();
-      final userJson = jsonEncode({
-        'id': dummyUser.id,
-        'name': dummyUser.name,
-        'role': dummyUser.role,
-        'employeeId': dummyUser.employeeId,
-        'contact': dummyUser.contact,
-      });
-      await prefs.setString('user_session', userJson);
+      await prefs.setString('user_session', jsonEncode(user.toJson()));
 
-      state = AuthState(user: dummyUser, isLoading: false);
+      state = AuthState(user: user, isLoading: false);
+      
+      // Trigger Sync
+      await _ref.read(syncServiceProvider).performFullSync();
     } else {
-      state = AuthState(error: 'Invalid credentials', isLoading: false);
+      state = AuthState(error: result['error'] ?? 'Invalid credentials', isLoading: false);
     }
   }
 
@@ -101,5 +113,6 @@ class AuthService extends StateNotifier<AuthState> {
 
 // --- Providers ---
 final authProvider = StateNotifierProvider<AuthService, AuthState>((ref) {
-  return AuthService();
+  final apiClient = ref.watch(apiClientProvider);
+  return AuthService(apiClient, ref);
 });

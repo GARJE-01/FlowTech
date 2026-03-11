@@ -23,6 +23,7 @@ import '../../features/order_tracking/presentation/order_detail_screen.dart'; //
 import '../../features/invoice/presentation/invoice_screen.dart'; // New Import
 import '../../features/payment/presentation/payment_list_screen.dart'; // New Import
 import '../../features/payment/presentation/payment_detail_screen.dart';
+import '../../features/bills/presentation/bills_screen.dart'; // New Import
 import '../../features/notification/presentation/notification_list_screen.dart'; // New Import
 import '../../features/notification/presentation/notification_detail_screen.dart'; // New Import
 import '../../features/reports/presentation/reports_home_screen.dart';
@@ -136,10 +137,7 @@ final routerProvider = Provider<GoRouter>((ref) {
            // --- Feature Other: Bills ---
           GoRoute(
             path: '/bills',
-             // For now, link generic bills to "Orders" or specific invoice list if we had one.
-             // But requirement says "Invoice accessible from Dashboard".
-             // Let's redirect /bills to /orders for now as it's the gateway.
-             redirect: (context, state) => '/orders', 
+            builder: (context, state) => const BillsScreen(),
           ),
           
           GoRoute(

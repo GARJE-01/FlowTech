@@ -11,9 +11,14 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Invalid items" }, { status: 400 });
         }
 
+        if (!body.shopId) {
+            return NextResponse.json({ error: "Missing shopId" }, { status: 400 });
+        }
+
         const res = await createOrder({
             items: body.items,
-            salesmanId: body.salesmanId // Optional, or use a delivery-specific ID
+            salesmanId: body.salesmanId, // Optional, or use a delivery-specific ID
+            shopId: body.shopId
         });
 
         if (res.success) {

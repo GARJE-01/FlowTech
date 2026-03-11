@@ -152,7 +152,7 @@ class DashboardScreen extends ConsumerWidget {
                   children: [
                     _buildActionButton(context, "Today's Route", LucideIcons.mapPin, () => context.push('/route'), isPrimary: true),
                     _buildActionButton(context, 'Shop List', LucideIcons.list, () => context.push('/shops')),
-                    _buildActionButton(context, 'Add Shop', LucideIcons.plus, () => context.push('/shops/add')),
+                    _buildActionButton(context, 'Add Shop', LucideIcons.plus, () => context.push('/add-shop')),
                     _buildActionButton(context, 'New Order', LucideIcons.shoppingCart, () => context.push('/order/select-shop')),
                     _buildActionButton(context, 'Orders', LucideIcons.fileText, () => context.push('/orders')),
                     _buildActionButton(context, 'Payments', LucideIcons.indianRupee, () => context.push('/payments')),

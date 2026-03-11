@@ -10,6 +10,9 @@ import '../domain/order_item_model.dart';
 import '../../shop/domain/shop_model.dart';
 import '../../notification/data/notification_service.dart';
 import '../../notification/domain/notification_model.dart';
+import '../../../core/network/api_client.dart';
+import '../../auth/data/auth_service.dart';
+
 
 class OrderService extends StateNotifier<List<Order>> {
   final Ref ref;
@@ -164,20 +167,48 @@ class OrderListNotifier extends StateNotifier<List<Order>> {
     state.sort((a, b) => b.createdAt.compareTo(a.createdAt));
   }
 
-  void submitOrder(Order draftOrder) {
-    // 1. Change status
-    final submittedOrder = draftOrder.copyWith(
-      status: OrderStatus.pending,
-      updatedAt: DateTime.now(),
-    );
-
-    // 2. Add to list
-    state = [submittedOrder, ...state];
-    _storage.saveOrders(state);
-
-    // 3. Update Visit Status
-    ref.read(visitProvider.notifier).markOrderPlaced(draftOrder.shopId);
+  void syncOrders(List<Order> newOrders) {
+    state = newOrders;
+    _storage.saveOrders(newOrders);
   }
+
+  Future<bool> submitOrder(Order draftOrder) async {
+    final apiClient = ref.read(apiClientProvider);
+    final user = ref.read(authProvider).user;
+
+    // 1. Prepare data for API
+    final orderData = {
+      "shopId": int.tryParse(draftOrder.shopId) ?? 0,
+      "salesmanId": user?.id,
+      "items": draftOrder.items.map((item) => {
+        "variantId": int.tryParse(item.productId) ?? 0, // In this app variantId isproductId for simple mock
+        "quantity": item.quantity,
+        "price": item.pricePerUnit
+      }).toList(),
+    };
+
+    // 2. Call API
+    final result = await apiClient.post("/orders/create", orderData);
+
+    if (result['success'] == true) {
+      // 3. Update local list on success
+      final submittedOrder = draftOrder.copyWith(
+        id: result['orderId'].toString(),
+        status: OrderStatus.pending,
+        updatedAt: DateTime.now(),
+      );
+
+      state = [submittedOrder, ...state];
+      _storage.saveOrders(state);
+
+      // 4. Update Visit Status
+      ref.read(visitProvider.notifier).markOrderPlaced(draftOrder.shopId);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   // 4. Mock Admin Action
   void simulateAdminAction(String orderId, bool approve) { 
     state = [

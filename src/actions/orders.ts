@@ -6,6 +6,7 @@ import { orders, orderItems, productVariants, stockLedger } from "@/db/schema";
 import { revalidatePath } from "next/cache";
 import { eq, sql } from "drizzle-orm";
 import { auth } from "@/lib/auth"; // Access session if needed server-side, but usually passed or context
+import { createNotification } from "./notifications";
 
 export async function createOrder(data: {
     items: { variantId: number; quantity: number; price: number }[];
@@ -40,6 +41,17 @@ export async function createOrder(data: {
         });
 
         revalidatePath("/admin/orders");
+
+        if (data.salesmanId) {
+            await createNotification({
+                salesmanId: data.salesmanId,
+                type: 'order',
+                title: 'Order Created',
+                message: `Order #${orderId} has been created successfully.`,
+                relatedId: orderId
+            });
+        }
+
         return { success: true, orderId };
     } catch (error) {
         console.error("Failed to create order:", error);
@@ -50,12 +62,15 @@ export async function createOrder(data: {
 export async function approveOrder(orderId: string, approverId: string) {
     try {
         await db.transaction(async (tx) => {
-            // 1. Update Order Status
+            // 1. Get existing order to find salesmanId
+            const [orderRecord] = await tx.select().from(orders).where(eq(orders.id, orderId));
+
+            // 2. Update Order Status
             await tx.update(orders)
                 .set({ status: "approved", approverId, updatedAt: new Date() })
                 .where(eq(orders.id, orderId));
 
-            // 2. Deduct Stock
+            // 3. Deduct Stock
             const items = await tx.select().from(orderItems).where(eq(orderItems.orderId, orderId));
 
             for (const item of items) {
@@ -81,6 +96,19 @@ export async function approveOrder(orderId: string, approverId: string) {
 
         revalidatePath("/admin/orders");
         revalidatePath("/admin/inventory");
+
+        // Notify Salesman
+        const [orderData] = await db.select({ salesmanId: orders.salesmanId }).from(orders).where(eq(orders.id, orderId));
+        if (orderData?.salesmanId) {
+            await createNotification({
+                salesmanId: orderData.salesmanId,
+                type: 'order',
+                title: 'Order Approved',
+                message: `Your order #${orderId} has been approved.`,
+                relatedId: orderId
+            });
+        }
+
         return { success: true };
     } catch (error) {
         console.error("Failed to approve order:", error);
@@ -95,6 +123,19 @@ export async function rejectOrder(orderId: string, approverId: string) {
             .where(eq(orders.id, orderId));
 
         revalidatePath("/admin/orders");
+
+        // Notify Salesman
+        const [orderData] = await db.select({ salesmanId: orders.salesmanId }).from(orders).where(eq(orders.id, orderId));
+        if (orderData?.salesmanId) {
+            await createNotification({
+                salesmanId: orderData.salesmanId,
+                type: 'order',
+                title: 'Order Rejected',
+                message: `Your order #${orderId} has been rejected.`,
+                relatedId: orderId
+            });
+        }
+
         return { success: true };
     } catch (error) {
         return { success: false, error: "Failed to reject order" };

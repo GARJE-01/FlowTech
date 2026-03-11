@@ -2,7 +2,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import '../../city/data/city_service.dart'; // To filter by selected city
 import '../../../core/storage/storage_service.dart';
+import '../../../core/network/api_client.dart';
 import '../domain/shop_model.dart';
+import '../../auth/data/auth_service.dart';
 
 // Mock Data
 final _initialShops = [
@@ -48,8 +50,9 @@ final _initialShops = [
 
 class ShopService extends StateNotifier<List<Shop>> {
   final StorageService _storage;
+  final Ref ref;
 
-  ShopService(this._storage) : super([]) {
+  ShopService(this._storage, this.ref) : super([]) {
     _loadShops();
   }
 
@@ -58,36 +61,72 @@ class ShopService extends StateNotifier<List<Shop>> {
     if (loaded.isNotEmpty) {
       state = loaded;
     } else {
-      // First run: Use mock data and save it
-      state = _initialShops;
-      _storage.saveShops(_initialShops);
+      // First run: Empty list until sync
+      state = [];
     }
   }
 
-  void addShop(Shop shop) {
-    state = [...state, shop];
-    _storage.saveShops(state);
+  void syncShops(List<Shop> newShops) {
+    state = newShops;
+    _storage.saveShops(newShops);
   }
 
-  void updateShopStatus(String id, ShopStatus status) {
-    state = [
-      for (final shop in state)
-        if (shop.id == id) shop.copyWith(status: status) else shop
-    ];
-    _storage.saveShops(state);
+  Future<bool> addShop(Shop shop) async {
+    final apiClient = ref.read(apiClientProvider);
+    final authState = ref.read(authProvider);
+
+    final data = {
+      "shopName": shop.name,
+      "ownerName": shop.ownerName,
+      "city": shop.cityId, // Sending city mapping
+      "mobileNumber": shop.mobileNumber,
+      "address": shop.address,
+      "gstNumber": shop.gstNumber,
+      "isActive": shop.status == ShopStatus.active,
+      "salesmanId": authState.user?.id,
+    };
+
+    final result = await apiClient.post("/shops/create", data);
+    
+    if (result['success'] == true) {
+      final realId = result['shopId'].toString();
+      final finalShop = shop.copyWith(id: realId);
+      state = [...state, finalShop];
+      _storage.saveShops(state);
+      return true;
+    }
+    return false;
+  }
+
+  Future<bool> updateShopStatus(String id, ShopStatus status) async {
+    final apiClient = ref.read(apiClientProvider);
+    
+    final data = {
+      "shopId": id,
+      "isActive": status == ShopStatus.active,
+    };
+
+    final result = await apiClient.post("/shops/update-status", data);
+
+    if (result['success'] == true) {
+      state = [
+        for (final shop in state)
+          if (shop.id == id) shop.copyWith(status: status) else shop
+      ];
+      _storage.saveShops(state);
+      return true;
+    }
+    return false;
   }
 
   // Soft delete / Deactivate
-  void deactivateShop(String id) {
-    updateShopStatus(id, ShopStatus.inactive);
+  Future<bool> deactivateShop(String id) async {
+    return await updateShopStatus(id, ShopStatus.inactive);
   }
 }
 
-final storageServiceProvider = FutureProvider<StorageService>((ref) async {
-  return await StorageService.init();
-});
-
 final shopProvider = StateNotifierProvider<ShopService, List<Shop>>((ref) {
+
   // We need to wait for storage to be ready. 
   // However, StateNotifier provider cannot be async directly for initialization in a simple way
   // without using AsyncValue or initializing in main.

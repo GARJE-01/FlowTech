@@ -29,7 +29,9 @@ export default async function SalesmenPage() {
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Name</TableHead>
-                                <TableHead>Email</TableHead>
+                                 <TableHead>Email</TableHead>
+                                <TableHead>Phone</TableHead>
+                                <TableHead>Area</TableHead>
                                 <TableHead>Role</TableHead>
                                 <TableHead>Created At</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
@@ -39,12 +41,15 @@ export default async function SalesmenPage() {
                             {allUsers.map((user) => (
                                 <TableRow key={user.id}>
                                     <TableCell className="font-medium">{user.name}</TableCell>
-                                    <TableCell>{user.email}</TableCell>
+                                     <TableCell>{user.email}</TableCell>
+                                    <TableCell>{user.phoneNumber ?? "-"}</TableCell>
+                                    <TableCell>{user.area ?? "-"}</TableCell>
                                     <TableCell>
                                         <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>
                                             {user.role}
                                         </Badge>
                                     </TableCell>
+
                                     <TableCell>{user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "-"}</TableCell>
                                     <TableCell className="text-right">
                                         <DeleteSalesmanButton 

@@ -1,6 +1,7 @@
 import 'order_item_model.dart';
 
-enum OrderStatus { draft, pending, approved, rejected }
+enum OrderStatus { draft, pending, approved, rejected, delivered }
+
 
 class Order {
   final String id;

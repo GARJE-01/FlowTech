@@ -1,0 +1,3 @@
+scripts/create_notifications_table.ts(3,25): error TS2307: Cannot find module 'dotenv' or its corresponding type declarations.
+src/app/api/delivery/order/route.ts(14,39): error TS2345: Argument of type '{ items: any; salesmanId: any; }' is not assignable to parameter of type '{ items: { variantId: number; quantity: number; price: number; }[]; salesmanId?: string | undefined; shopId: number; }'.
+  Property 'shopId' is missing in type '{ items: any; salesmanId: any; }' but required in type '{ items: { variantId: number; quantity: number; price: number; }[]; salesmanId?: string | undefined; shopId: number; }'.

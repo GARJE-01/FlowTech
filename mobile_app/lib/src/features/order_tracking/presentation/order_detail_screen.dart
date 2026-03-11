@@ -37,29 +37,14 @@ class OrderDetailScreen extends ConsumerWidget {
                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Edit functionality coming soon.')));
               },
             ),
-             
-          // Debug Actions
-          PopupMenuButton<String>(
-            onSelected: (value) {
-              if (value == 'invoice') {
+          if (order.status == OrderStatus.approved)
+            IconButton(
+              icon: const Icon(LucideIcons.fileText),
+              tooltip: 'View Invoice',
+              onPressed: () {
                 context.push('/invoices/$orderId');
-              } else if (value == 'approve') {
-                ref.read(orderListProvider.notifier).simulateAdminAction(orderId, true);
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Order Approved (Simulated)')));
-              } else if (value == 'reject') {
-                ref.read(orderListProvider.notifier).simulateAdminAction(orderId, false);
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Order Rejected (Simulated)')));
-              }
-            },
-            itemBuilder: (BuildContext context) {
-              return [
-                if (ref.read(orderListProvider.notifier).getOrderById(orderId)?.status == OrderStatus.approved)
-                   const PopupMenuItem(value: 'invoice', child: Text('View Invoice')),
-                const PopupMenuItem(value: 'approve', child: Text('Simulate Approve (Dev)')),
-                const PopupMenuItem(value: 'reject', child: Text('Simulate Reject (Dev)')),
-              ];
-            },
-          ),
+              },
+            ),
         ],
       ),
       body: SingleChildScrollView(

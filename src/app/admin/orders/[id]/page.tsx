@@ -21,6 +21,11 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                     status={order.status || 'pending'}
                     items={order.items}
                     totalAmount={order.totalAmount}
+                    shopName={order.shopName || ''}
+                    shopAddress={order.shopAddress || ''}
+                    shopGST={order.shopGST || ''}
+                    salesmanName={order.salesmanName || ''}
+                    createdAt={order.createdAt!}
                 />
             </div>
 
