@@ -19,7 +19,11 @@ interface VariantOption {
     stock: number;
 }
 
-export function CreateOrderForm({ variants }: { variants: VariantOption[] }) {
+export function CreateOrderForm({ variants, shops }: { 
+    variants: VariantOption[],
+    shops: { id: number; shopName: string; ownerName: string }[]
+}) {
+    const [shopId, setShopId] = useState<string>("");
     const [items, setItems] = useState<{ variantId: string; quantity: number; price: number }[]>([]);
     const [loading, setLoading] = useState(false);
     const router = useRouter();
@@ -50,12 +54,14 @@ export function CreateOrderForm({ variants }: { variants: VariantOption[] }) {
     const totalAmount = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
     const handleSubmit = async () => {
+        if (!shopId) return alert("Please select a shop");
         if (items.length === 0) return alert("Add at least one item");
         if (items.some(i => !i.variantId || i.quantity <= 0)) return alert("Invalid items");
 
         setLoading(true);
         try {
             const res = await createOrder({
+                shopId: parseInt(shopId),
                 items: items.map(i => ({
                     variantId: parseInt(i.variantId),
                     quantity: i.quantity,
@@ -78,8 +84,26 @@ export function CreateOrderForm({ variants }: { variants: VariantOption[] }) {
 
     return (
         <Card>
-            <CardContent className="p-6 space-y-4">
-                {items.map((item, index) => (
+            <CardContent className="p-6 space-y-6">
+                <div className="grid gap-2 max-w-sm">
+                    <Label htmlFor="shop">Select Shop</Label>
+                    <Select value={shopId} onValueChange={setShopId}>
+                        <SelectTrigger id="shop">
+                            <SelectValue placeholder="Select a shop" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {shops.map(shop => (
+                                <SelectItem key={shop.id} value={shop.id.toString()}>
+                                    {shop.shopName} ({shop.ownerName})
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                <div className="space-y-4">
+                    {items.map((item, index) => (
+
                     <div key={index} className="flex gap-4 items-end border-b pb-4">
                         <div className="flex-1">
                             <Label>Product / SKU</Label>
@@ -125,6 +149,8 @@ export function CreateOrderForm({ variants }: { variants: VariantOption[] }) {
                         </Button>
                     </div>
                 ))}
+                </div>
+
 
                 <Button variant="outline" onClick={addItem} className="w-full">
                     <Plus className="mr-2 h-4 w-4" /> Add Item

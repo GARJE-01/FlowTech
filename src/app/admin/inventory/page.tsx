@@ -1,17 +1,18 @@
 
-import { getProductsWithVariants, getSuppliersSelect } from "@/db/queries";
+import { getProductsWithVariants, getSuppliersSelect, getSupplierProductMappings } from "@/db/queries";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Plus, Archive } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { AddProductDialog } from "@/components/inventory/add-product-dialog";
-import { StockInDialog } from "@/components/inventory/stock-in-dialog";
+import { GlobalStockInDialog } from "@/components/inventory/global-stock-in-dialog";
 import { ProductCSVImport } from "@/components/inventory/product-csv-import";
 
 export default async function InventoryPage() {
     const products = await getProductsWithVariants();
     const suppliers = await getSuppliersSelect();
+    const mappings = await getSupplierProductMappings();
 
     return (
         <div className="flex flex-col gap-4">
@@ -19,6 +20,11 @@ export default async function InventoryPage() {
                 <h1 className="text-3xl font-bold tracking-tight">Inventory</h1>
                 <div className="flex gap-2">
                     <ProductCSVImport />
+                    <GlobalStockInDialog 
+                        suppliers={suppliers} 
+                        products={products} 
+                        mappings={mappings} 
+                    />
                     <AddProductDialog />
                 </div>
             </div>
@@ -56,18 +62,27 @@ export default async function InventoryPage() {
                                                         {v.variantName && <span className="text-muted-foreground"> ({v.variantName})</span>}
                                                         <div className="text-xs">Stock: {v.currentStock} | Price: ₹{v.price}</div>
                                                     </div>
-                                                    <StockInDialog
-                                                        variantId={v.id}
-                                                        sku={v.sku}
-                                                        productName={product.name}
-                                                        suppliers={suppliers}
-                                                    />
                                                 </div>
                                             ))}
                                         </div>
                                     </TableCell>
                                     <TableCell className="text-right">
-                                        <Button variant="ghost" size="sm">Edit</Button>
+                                        <AddProductDialog
+                                            initialData={{
+                                                id: product.id,
+                                                name: product.name,
+                                                category: product.category,
+                                                basePrice: product.basePrice,
+                                                variants: product.variants.map(v => ({
+                                                    id: v.id,
+                                                    sku: v.sku,
+                                                    price: v.price,
+                                                    currentStock: v.currentStock,
+                                                    variantName: v.variantName
+                                                }))
+                                            }}
+                                            trigger={<Button variant="ghost" size="sm">Edit</Button>}
+                                        />
                                     </TableCell>
                                 </TableRow>
                             ))}

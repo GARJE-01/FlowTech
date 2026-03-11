@@ -9,8 +9,10 @@ import { auth } from "@/lib/auth"; // Access session if needed server-side, but 
 
 export async function createOrder(data: {
     items: { variantId: number; quantity: number; price: number }[];
-    salesmanId?: string; // If null, maybe admin created it
+    salesmanId?: string;
+    shopId: number;
 }) {
+
     try {
         const totalAmount = data.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
@@ -21,9 +23,11 @@ export async function createOrder(data: {
             await tx.insert(orders).values({
                 id: orderId,
                 salesmanId: data.salesmanId,
+                shopId: data.shopId,
                 totalAmount: totalAmount,
                 status: "pending",
             });
+
 
             for (const item of data.items) {
                 await tx.insert(orderItems).values({

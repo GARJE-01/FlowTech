@@ -56,6 +56,78 @@ export async function addProduct(data: {
     }
 }
 
+export async function updateProduct(data: {
+    id: number;
+    name: string;
+    category: string;
+    description?: string;
+    basePrice: number;
+    variants: {
+        id?: number;
+        sku: string;
+        price: number;
+        currentStock: number;
+        variantName: string;
+    }[];
+}) {
+    try {
+        // 1. Update Product
+        await db.update(products).set({
+            name: data.name,
+            category: data.category,
+            description: data.description,
+            basePrice: data.basePrice,
+        }).where(eq(products.id, data.id));
+
+        // 2. Handle Variants
+        // Delete missing, Update existing, Insert new
+        const existingVariants = await db.select().from(productVariants).where(eq(productVariants.productId, data.id));
+        const incomingIds = data.variants.map(v => v.id).filter(id => id !== undefined) as number[];
+
+        // Delete missing
+        for (const existing of existingVariants) {
+            if (!incomingIds.includes(existing.id)) {
+                await db.delete(productVariants).where(eq(productVariants.id, existing.id));
+            }
+        }
+
+        // Update or Insert
+        for (const variant of data.variants) {
+            if (variant.id) {
+                await db.update(productVariants).set({
+                    sku: variant.sku,
+                    price: variant.price,
+                    variantName: variant.variantName,
+                    currentStock: variant.currentStock,
+                }).where(eq(productVariants.id, variant.id));
+            } else {
+                const newVariant = await db.insert(productVariants).values({
+                    productId: data.id,
+                    sku: variant.sku,
+                    price: variant.price,
+                    variantName: variant.variantName,
+                    currentStock: variant.currentStock,
+                }).returning({ id: productVariants.id });
+
+                if (variant.currentStock > 0) {
+                    await db.insert(stockLedger).values({
+                        variantId: newVariant[0].id,
+                        changeAmount: variant.currentStock,
+                        type: "STOCK_IN",
+                        notes: "Initial Stock (via Edit)",
+                    });
+                }
+            }
+        }
+
+        revalidatePath("/admin/inventory");
+        return { success: true };
+    } catch (error) {
+        console.error("Failed to update product:", error);
+        return { success: false, error: "Failed to update product" };
+    }
+}
+
 export async function stockIn(data: {
     variantId: number;
     quantity: number;

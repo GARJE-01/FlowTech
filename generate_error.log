@@ -1,0 +1,6 @@
+No config path provided, using default 'drizzle.config.ts'
+Reading config file 'C:\Users\adity\Flowtech1\drizzle.config.ts'
+Cannot find module 'dotenv'
+Require stack:
+- C:\Users\adity\Flowtech1\drizzle.config.ts
+- C:\Users\adity\Flowtech1\node_modules\drizzle-kit\bin.cjs

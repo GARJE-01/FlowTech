@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AddSalesmanDialog } from "@/components/salesmen/add-salesman-dialog";
 import { Badge } from "@/components/ui/badge";
+import { DeleteSalesmanButton } from "@/components/salesmen/delete-salesman-button";
 
 export default async function SalesmenPage() {
     const salesmen = await db.select().from(user).where(eq(user.role, "salesman"));
@@ -46,7 +47,11 @@ export default async function SalesmenPage() {
                                     </TableCell>
                                     <TableCell>{user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "-"}</TableCell>
                                     <TableCell className="text-right">
-                                        {/* Actions like Edit/Delete */}
+                                        <DeleteSalesmanButton 
+                                            userId={user.id} 
+                                            userName={user.name} 
+                                            disabled={user.role === 'admin'} 
+                                        />
                                     </TableCell>
                                 </TableRow>
                             ))}

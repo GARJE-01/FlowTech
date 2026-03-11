@@ -1,0 +1,6 @@
+No config path provided, using default 'drizzle.config.ts'
+Reading config file 'C:\Users\adity\Flowtech1\drizzle.config.ts'
+0 tables
+
+
+No schema changes, nothing to migrate ≡ƒÿ┤

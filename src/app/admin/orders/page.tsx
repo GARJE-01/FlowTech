@@ -30,18 +30,22 @@ export default async function OrdersPage() {
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Order ID</TableHead>
+                                <TableHead>Shop</TableHead>
                                 <TableHead>Salesman</TableHead>
                                 <TableHead>Status</TableHead>
                                 <TableHead>Amount</TableHead>
                                 <TableHead>Date</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
+
                         </TableHeader>
                         <TableBody>
                             {orders.map((order) => (
                                 <TableRow key={order.id}>
                                     <TableCell className="font-medium">{order.id}</TableCell>
+                                    <TableCell>{order.shopName || "Unknown Shop"}</TableCell>
                                     <TableCell>{order.salesmanName || "Unknown"}</TableCell>
+
                                     <TableCell>
                                         <Badge variant={
                                             order.status === 'approved' ? 'default' :

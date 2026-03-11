@@ -21,12 +21,23 @@ export default function SignIn() {
         const { data, error } = await authClient.signIn.email({
             email,
             password,
-            callbackURL: "/admin", // Redirect to dashboard on success
         }, {
             onRequest: () => {
                 // show loading
             },
-            onSuccess: () => {
+            onSuccess: async (ctx) => {
+                // Instantly check role
+                const sessionResponse = await authClient.getSession();
+                const role = (sessionResponse.data?.user as any)?.role;
+
+                if (role !== 'admin') {
+                    // Sign them completely out so they don't even get a session
+                    await authClient.signOut();
+                    alert("Access Denied: You must be an administrator to log into this dashboard. Salesmen must use the Mobile App.");
+                    setLoading(false);
+                    return;
+                }
+
                 router.push("/admin");
             },
             onError: (ctx) => {

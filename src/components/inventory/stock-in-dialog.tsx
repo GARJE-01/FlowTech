@@ -77,9 +77,18 @@ export function StockInDialog({ variantId, sku, productName, suppliers }: StockI
                                 <SelectValue placeholder="Select Supplier" />
                             </SelectTrigger>
                             <SelectContent>
-                                {suppliers.map(s => (
-                                    <SelectItem key={s.id} value={s.id.toString()}>{s.name}</SelectItem>
-                                ))}
+                                {(() => {
+                                    const filtered = suppliers.filter(s => 
+                                        productName.toLowerCase().includes(s.name.toLowerCase()) || 
+                                        s.name.toLowerCase().includes(productName.toLowerCase())
+                                    );
+                                    // If no matches, show all (or could show none, but usually safer to show all if heuristic fails)
+                                    const displaySuppliers = filtered.length > 0 ? filtered : suppliers;
+                                    
+                                    return displaySuppliers.map(s => (
+                                        <SelectItem key={s.id} value={s.id.toString()}>{s.name}</SelectItem>
+                                    ));
+                                })()}
                             </SelectContent>
                         </Select>
                     </div>

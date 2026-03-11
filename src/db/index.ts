@@ -1,8 +1,10 @@
-
-import { drizzle } from 'drizzle-orm/libsql';
-import { createClient } from '@libsql/client';
+import { drizzle } from 'drizzle-orm/postgres-js';
+import postgres from 'postgres';
 import * as schema from './schema';
 
-const client = createClient({ url: process.env.DB_FILE_NAME || 'file:local.db' });
+// Connection string from your .env
+const connectionString = process.env.DATABASE_URL!;
 
+// Database Client
+const client = postgres(connectionString);
 export const db = drizzle(client, { schema });

@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1773212619406,
+      "tag": "0000_sparkling_raza",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1773220112633,
+      "tag": "0001_futuristic_tyger_tiger",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1773222304475,
+      "tag": "0002_bitter_doctor_strange",
+      "breakpoints": true
+    }
+  ]
+}
