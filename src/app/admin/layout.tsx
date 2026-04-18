@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
