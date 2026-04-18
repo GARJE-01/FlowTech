@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 
 import { getProductsWithVariants, getSuppliersSelect, getSupplierProductMappings } from "@/db/queries";
 import { Button } from "@/components/ui/button";

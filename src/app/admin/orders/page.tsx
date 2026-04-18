@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 
 import { getOrders } from "@/db/queries";
 import { Button } from "@/components/ui/button";

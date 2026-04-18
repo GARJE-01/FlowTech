@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 
 import { getProductsWithVariants, getShops } from "@/db/queries";
 import { CreateOrderForm } from "@/components/orders/create-order-form";

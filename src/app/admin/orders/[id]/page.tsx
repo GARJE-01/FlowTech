@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 
 import { getOrder } from "@/db/queries";
 import { notFound } from "next/navigation";

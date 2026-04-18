@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DollarSign, Package, ShoppingCart, Users, Store, CheckCircle, ClipboardList, Wallet } from "lucide-react";
 import { OverviewChart } from "@/components/dashboard/overview-chart";

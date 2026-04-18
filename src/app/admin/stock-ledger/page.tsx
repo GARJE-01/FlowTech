@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 
 import { getStockLedger } from "@/db/queries";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
