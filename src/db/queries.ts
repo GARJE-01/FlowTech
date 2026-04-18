@@ -70,6 +70,7 @@ export async function getOrder(id: string) {
         createdAt: orders.createdAt,
         salesmanName: user.name,
         shopName: shops.shopName,
+        shopOwner: shops.ownerName,
         shopAddress: shops.address,
         shopGST: shops.gstNumber,
         paidAmount: orders.paidAmount,

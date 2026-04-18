@@ -74,6 +74,14 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                             <span className="font-medium">{order.id}</span>
                         </div>
                         <div className="flex justify-between">
+                            <span className="text-muted-foreground">Shop:</span>
+                            <span className="font-medium">{order.shopName || "Unknown"}</span>
+                        </div>
+                        <div className="flex justify-between">
+                            <span className="text-muted-foreground">Owner:</span>
+                            <span className="font-medium">{order.shopOwner || "Unknown"}</span>
+                        </div>
+                        <div className="flex justify-between">
                             <span className="text-muted-foreground">Date:</span>
                             <span className="font-medium">{order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "-"}</span>
                         </div>

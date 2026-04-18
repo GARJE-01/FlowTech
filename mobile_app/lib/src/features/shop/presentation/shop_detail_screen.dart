@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../data/shop_service.dart';
 import '../domain/shop_model.dart';
+import '../../order/data/order_service.dart';
 
 class ShopDetailScreen extends ConsumerWidget {
   final String shopId;
@@ -86,9 +87,13 @@ class ShopDetailScreen extends ConsumerWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: FilledButton.icon(
-                  onPressed: () {
-                     // Placeholder for order creation in future
-                     context.push('/orders/create?shopId=${shop.id}');
+                   onPressed: () {
+                     ref.read(draftOrderProvider.notifier).startNewDraft(
+                       shopId: shop.id,
+                       shopName: shop.name,
+                       cityId: shop.cityId,
+                     );
+                     context.push('/products');
                   },
                   icon: const Icon(LucideIcons.shoppingCart),
                   label: const Text('Place New Order'),
@@ -106,9 +111,7 @@ class ShopDetailScreen extends ConsumerWidget {
                 ),
              ),
              const SizedBox(height: 8),
-             _buildEmptyHistoryPlaceholder(),
-
-             const SizedBox(height: 32),
+             _buildOrderHistory(context, ref, shop.id),
 
              // 4. Danger Zone (Deactivate)
              if (isActive)
@@ -147,24 +150,49 @@ class ShopDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildEmptyHistoryPlaceholder() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[200]!),
-      ),
-      child: Center(
-        child: Column(
-          children: [
-            Icon(LucideIcons.clock, size: 32, color: Colors.grey[400]),
-            const SizedBox(height: 8),
-            Text('No orders yet', style: TextStyle(color: Colors.grey[500])),
-          ],
+  Widget _buildOrderHistory(BuildContext context, WidgetRef ref, String shopId) {
+    final allOrders = ref.watch(orderListProvider);
+    final shopOrders = allOrders.where((o) => o.shopId == shopId).toList();
+    shopOrders.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+    if (shopOrders.isEmpty) {
+      return Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: Colors.grey[100],
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey[200]!),
         ),
-      ),
+        child: Center(
+          child: Column(
+            children: [
+              Icon(LucideIcons.clock, size: 32, color: Colors.grey[400]),
+              const SizedBox(height: 8),
+              Text('No orders yet', style: TextStyle(color: Colors.grey[500])),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return ListView.separated(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      itemCount: shopOrders.take(5).length, // Show up to 5 recent orders
+      separatorBuilder: (_, __) => const SizedBox(height: 8),
+      itemBuilder: (context, index) {
+        final order = shopOrders[index];
+        return Card(
+          child: ListTile(
+            title: Text('Order #${order.id.substring(order.id.length - 6)}', style: const TextStyle(fontWeight: FontWeight.bold)),
+            subtitle: Text('₹${order.totalAmount.toStringAsFixed(0)} - ${order.status.name.toUpperCase()}'),
+            trailing: const Icon(LucideIcons.chevronRight),
+            onTap: () => context.push('/orders/${order.id}'),
+          ),
+        );
+      },
     );
   }
 

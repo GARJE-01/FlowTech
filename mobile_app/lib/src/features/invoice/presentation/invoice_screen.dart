@@ -4,6 +4,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
 import '../../order/data/order_service.dart';
 import '../../order/domain/order_model.dart';
+import '../../shop/data/shop_service.dart';
 import '../../payment/data/payment_service.dart';
 import 'package:go_router/go_router.dart';
 
@@ -113,8 +114,18 @@ class InvoiceScreen extends ConsumerWidget {
                         children: [
                           const Text('BILL TO:', style: TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.bold)),
                           const SizedBox(height: 4),
-                          Text(order.shopName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                          const Text('Address not provided', style: TextStyle(fontSize: 12)),
+                          Consumer(
+                            builder: (context, ref, child) {
+                               final shop = ref.watch(shopProvider).where((s) => s.id == order.shopId).firstOrNull;
+                               return Column(
+                                 crossAxisAlignment: CrossAxisAlignment.start,
+                                 children: [
+                                   Text('${order.shopName} (${shop?.ownerName ?? "Unknown Owner"})', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                                   Text(shop?.address ?? 'Address not provided', style: const TextStyle(fontSize: 12)),
+                                 ],
+                               );
+                            }
+                          ),
                           const Text('GSTIN: N/A', style: TextStyle(fontSize: 12)),
                         ],
                       ),

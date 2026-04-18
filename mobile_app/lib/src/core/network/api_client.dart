@@ -8,7 +8,7 @@ import '../storage/storage_service.dart';
 class ApiClient {
   // ─── Production URL (Vercel) ───────────────────────────────────────────────
   // Update this URL after deploying to Vercel.
-  static const String _productionUrl = "https://YOUR-APP.vercel.app/api/mobile";
+  static const String _productionUrl = "https://flow-tech-sooty.vercel.app/api/mobile";
 
   // ─── Local Dev URLs (uncomment when testing locally) ──────────────────────
   // Android Emulator:  "http://10.0.2.2:3000/api/mobile"

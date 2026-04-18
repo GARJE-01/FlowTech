@@ -6,6 +6,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../order/domain/order_model.dart';
 import '../../order/data/order_service.dart';
 import '../../city/data/city_service.dart';
+import '../../shop/data/shop_service.dart';
 
 class BillsScreen extends ConsumerWidget {
   const BillsScreen({super.key});
@@ -80,6 +81,16 @@ class BillsScreen extends ConsumerWidget {
                           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
+                        ),
+                        // Added Owner Name lookup
+                        Consumer(
+                          builder: (context, ref, child) {
+                            final shop = ref.watch(shopProvider).where((s) => s.id == order.shopId).firstOrNull;
+                            return Text(
+                              shop?.ownerName ?? 'Unknown Owner',
+                              style: TextStyle(color: Colors.grey[700], fontSize: 13, fontWeight: FontWeight.w500),
+                            );
+                          }
                         ),
                         const SizedBox(height: 4),
                         Text(

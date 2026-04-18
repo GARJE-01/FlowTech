@@ -98,7 +98,7 @@ class DashboardScreen extends ConsumerWidget {
                         radius: 20,
                         backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
                         child: Text(
-                          user?.name.substring(0, 1) ?? "U",
+                          (user?.name != null && user!.name.isNotEmpty) ? user!.name.substring(0, 1).toUpperCase() : "U",
                           style: TextStyle(
                             color: Theme.of(context).primaryColor,
                             fontWeight: FontWeight.bold,

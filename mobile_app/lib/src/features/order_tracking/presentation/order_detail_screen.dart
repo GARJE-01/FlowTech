@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../order/domain/order_model.dart';
 import '../../order/data/order_service.dart';
+import '../../shop/data/shop_service.dart';
 
 class OrderDetailScreen extends ConsumerWidget {
   final String orderId;
@@ -66,7 +67,19 @@ class OrderDetailScreen extends ConsumerWidget {
                      ],
                    ),
                    const SizedBox(height: 8),
-                   Text(order.shopName, style: const TextStyle(fontSize: 16)),
+                   Consumer(
+                     builder: (context, ref, child) {
+                       final shop = ref.watch(shopProvider).where((s) => s.id == order.shopId).firstOrNull;
+                       return Column(
+                         crossAxisAlignment: CrossAxisAlignment.start,
+                         children: [
+                           Text('${order.shopName} (${shop?.ownerName ?? "Unknown Owner"})', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                           if (shop?.address != null)
+                             Text(shop!.address, style: TextStyle(fontSize: 13, color: Colors.grey[700])),
+                         ],
+                       );
+                     }
+                   ),
                    const SizedBox(height: 4),
                    Text(DateFormat('MMM dd, yyyy • hh:mm a').format(order.createdAt), style: TextStyle(color: Colors.grey[600])),
                  ],
