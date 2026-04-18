@@ -1,7 +1,7 @@
 import { db } from "@/db";
 import { shops } from "@/db/schema";
 import { NextResponse } from "next/server";
-import { createNotification } from "@/actions/notifications";
+import { createNotification } from "@/lib/notifications";
 
 export async function POST(req: Request) {
     try {

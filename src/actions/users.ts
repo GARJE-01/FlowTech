@@ -6,7 +6,7 @@ import { user } from "@/db/schema";
 import { revalidatePath } from "next/cache";
 import { eq } from "drizzle-orm";
 import { auth } from "@/lib/auth"; // We use auth.api to create users properly with hashing
-import { createNotification } from "./notifications";
+import { createNotification } from "@/lib/notifications";
 
 export async function addSalesman(data: {
     name: string;

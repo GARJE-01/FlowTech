@@ -52,6 +52,8 @@ export async function getOrders() {
         createdAt: orders.createdAt,
         salesmanName: user.name,
         shopName: shops.shopName,
+        paidAmount: orders.paidAmount,
+        isPaid: orders.isPaid,
     })
         .from(orders)
         .leftJoin(user, eq(orders.salesmanId, user.id))
@@ -70,6 +72,8 @@ export async function getOrder(id: string) {
         shopName: shops.shopName,
         shopAddress: shops.address,
         shopGST: shops.gstNumber,
+        paidAmount: orders.paidAmount,
+        isPaid: orders.isPaid,
     })
         .from(orders)
         .leftJoin(user, eq(orders.salesmanId, user.id))

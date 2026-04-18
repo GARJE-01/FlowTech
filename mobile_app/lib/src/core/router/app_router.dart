@@ -23,6 +23,7 @@ import '../../features/order_tracking/presentation/order_detail_screen.dart'; //
 import '../../features/invoice/presentation/invoice_screen.dart'; // New Import
 import '../../features/payment/presentation/payment_list_screen.dart'; // New Import
 import '../../features/payment/presentation/payment_detail_screen.dart';
+import '../../features/payment/presentation/record_payment_screen.dart';
 import '../../features/bills/presentation/bills_screen.dart'; // New Import
 import '../../features/notification/presentation/notification_list_screen.dart'; // New Import
 import '../../features/notification/presentation/notification_detail_screen.dart'; // New Import
@@ -189,6 +190,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/payment-details/:id',
         builder: (context, state) => PaymentDetailScreen(paymentId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '/record-payment/:orderId',
+        builder: (context, state) => RecordPaymentScreen(orderId: state.pathParameters['orderId']!),
       ),
       GoRoute(
         path: '/notifications/:id',

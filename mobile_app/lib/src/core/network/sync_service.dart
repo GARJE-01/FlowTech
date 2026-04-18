@@ -11,6 +11,8 @@ import '../../features/order/domain/order_model.dart';
 import '../../features/order/domain/order_item_model.dart';
 import '../../features/notification/data/notification_service.dart';
 import '../../features/notification/domain/notification_model.dart';
+import '../../features/payment/data/payment_service.dart';
+import '../../features/payment/domain/payment_model.dart';
 
 class SyncService {
   final ApiClient _apiClient;
@@ -38,6 +40,7 @@ class SyncService {
         cityId: "1", // Manual mapping for now, or update schema
         gstNumber: s['gstNumber'],
         status: s['isActive'] ? ShopStatus.active : ShopStatus.inactive,
+        outstandingBalance: (s['outstandingBalance'] ?? s['outstanding_balance'] ?? 0).toDouble(),
       )).toList();
       _ref.read(shopProvider.notifier).syncShops(shops);
 
@@ -88,6 +91,7 @@ class SyncService {
           totalAmount: o['totalAmount'].toDouble(),
           subtotalAmount: o['totalAmount'].toDouble() / 1.18, // Rough reverse engineer since subtotal/gst not saved separately in simple DB schema
           gstAmount: o['totalAmount'].toDouble() - (o['totalAmount'].toDouble() / 1.18),
+          paidAmount: (o['paidAmount'] ?? o['paid_amount'] ?? 0).toDouble(),
           status: _mapStatus(o['status']),
           createdAt: DateTime.parse(o['createdAt']),
         );
@@ -100,6 +104,14 @@ class SyncService {
             .map((n) => NotificationModel.fromJson(n))
             .toList();
         _ref.read(notificationProvider.notifier).syncNotifications(notifications);
+      }
+
+      // 5. Sync Payments
+      if (data['payments'] != null) {
+        final List<Payment> payments = (data['payments'] as List)
+            .map((p) => Payment.fromJson(p))
+            .toList();
+        _ref.read(paymentProvider.notifier).syncPayments(payments);
       }
 
       return true;

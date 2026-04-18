@@ -12,6 +12,7 @@ import '../../notification/data/notification_service.dart';
 import '../../shop/data/shop_service.dart';
 import '../../shop/domain/shop_model.dart';
 import '../../order/data/order_service.dart';
+import '../../order/domain/order_model.dart'; // Added missing import
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -39,8 +40,9 @@ class DashboardScreen extends ConsumerWidget {
       o.createdAt.day == today.day
     ).length;
 
-    final pendingPaymentsCount = payments.where((p) => p.status == PaymentStatus.pending).length;
-    // final outstandingAmount = payments.fold(0.0, (sum, p) => sum + p.balanceAmount);
+    final pendingPaymentsCount = orders.where((o) => o.status == OrderStatus.approved && o.balanceAmount > 0).length;
+    final pendingPaymentsAmount = orders.where((o) => o.status != OrderStatus.rejected).fold(0.0, (sum, o) => sum + o.balanceAmount);
+    final outstandingAmount = shops.fold(0.0, (sum, shop) => sum + shop.outstandingBalance);
 
     return Scaffold(
       backgroundColor: Colors.grey[50], // Light background for contrast
@@ -123,7 +125,7 @@ class DashboardScreen extends ConsumerWidget {
                         _buildSummaryCard(context, 'Total Shops', '$totalShops', LucideIcons.store, width),
                         _buildSummaryCard(context, 'Active Shops', '$activeShops', LucideIcons.checkCircle, width, color: Colors.green),
                         _buildSummaryCard(context, 'Orders Today', '$ordersToday', LucideIcons.shoppingBag, width, color: Colors.blue),
-                        _buildSummaryCard(context, 'Pending Payments', '$pendingPaymentsCount', LucideIcons.indianRupee, width, color: Colors.orange),
+                        _buildSummaryCard(context, 'Pending Payments', '₹${pendingPaymentsAmount.toStringAsFixed(0)}', LucideIcons.indianRupee, width, color: Colors.orange),
                       ],
                     );
                   }

@@ -1,5 +1,6 @@
 import { createAuthClient } from "better-auth/react"
 
-export const authClient = createAuthClient({
-    baseURL: process.env.BETTER_AUTH_URL // the base url of your auth server
-})
+// baseURL is intentionally omitted — better-auth/react auto-detects the current origin.
+// This works correctly on both localhost and the Vercel production domain.
+export const authClient = createAuthClient({})
+

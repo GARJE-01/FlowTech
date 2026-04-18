@@ -108,30 +108,73 @@ class BillsScreen extends ConsumerWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Amount Due', style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                       Text('Balance Due', style: TextStyle(color: Colors.grey[600], fontSize: 12)),
                       const SizedBox(height: 4),
                        Text(
-                        '₹${order.totalAmount.toStringAsFixed(0)}', 
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Theme.of(context).primaryColor)
+                        '₹${order.balanceAmount.toStringAsFixed(0)}', 
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: order.balanceAmount > 0 ? Colors.red : Colors.green)
                       ),
                     ],
                   ),
                    Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Text('Date', style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                      Text('Total Bill: ₹${order.totalAmount.toStringAsFixed(0)}', style: TextStyle(color: Colors.grey[500], fontSize: 11)),
                       const SizedBox(height: 4),
-                      Text(
-                        DateFormat('MMM dd, yyyy').format(order.createdAt),
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                      ),
+                      _buildPaymentStatusBadge(order),
                     ],
                   ),
                 ],
               ),
+              if (order.balanceAmount > 0) ...[
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      context.push('/record-payment/${order.id}');
+                    },
+                    icon: const Icon(LucideIcons.indianRupee, size: 16),
+                    label: const Text('Record Payment'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).primaryColor,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                  ),
+                ),
+              ],
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildPaymentStatusBadge(Order order) {
+    Color color;
+    String label;
+    if (order.paidAmount <= 0) {
+      color = Colors.red;
+      label = 'UNPAID';
+    } else if (order.paidAmount < order.totalAmount) {
+      color = Colors.orange;
+      label = 'PARTIAL';
+    } else {
+      color = Colors.green;
+      label = 'PAID';
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: color.withOpacity(0.5)),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 10),
       ),
     );
   }

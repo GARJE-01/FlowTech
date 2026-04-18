@@ -248,6 +248,20 @@ class OrderListNotifier extends StateNotifier<List<Order>> {
   Order? getOrderById(String id) {
     return state.where((o) => o.id == id).firstOrNull;
   }
+
+  void updateOrderPayment(String orderId, double amount) {
+    state = [
+      for (final order in state)
+        if (order.id == orderId)
+          order.copyWith(
+            paidAmount: order.paidAmount + amount,
+            updatedAt: DateTime.now(),
+          )
+        else
+          order
+    ];
+    _storage.saveOrders(state);
+  }
 }
 
 final orderListProvider = StateNotifierProvider<OrderListNotifier, List<Order>>((ref) {

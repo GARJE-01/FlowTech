@@ -36,8 +36,10 @@ export default async function AdminDashboard() {
     const todayOrdersResult = await db.select({ count: count() }).from(orders).where(gte(orders.createdAt, today));
     const todayOrdersCount = todayOrdersResult[0]?.count || 0;
 
-    // 8. Pending Payments (unpaid orders that are not rejected)
-    const pendingPaymentsResult = await db.select({ total: sum(orders.totalAmount) })
+    // 8. Pending Payments (remaining balance on all orders)
+    const pendingPaymentsResult = await db.select({ 
+        total: sql<string>`SUM(${orders.totalAmount} - ${orders.paidAmount})` 
+    })
         .from(orders)
         .where(and(eq(orders.isPaid, false), ne(orders.status, 'rejected')));
     const pendingPayments = Number(pendingPaymentsResult[0]?.total || 0);

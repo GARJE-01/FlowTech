@@ -1,7 +1,7 @@
 
 import { db } from "@/db";
-import { shops, products, productVariants, orders, orderItems, notifications } from "@/db/schema";
-import { eq, and, gte, ne, count, inArray, desc } from "drizzle-orm";
+import { shops, products, productVariants, orders, orderItems, notifications, payments } from "@/db/schema";
+import { eq, and, gte, ne, count, inArray, desc, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
@@ -29,7 +29,7 @@ export async function GET(req: Request) {
         const salesmanOrders = await db.select()
             .from(orders)
             .where(eq(orders.salesmanId, salesmanId))
-            .orderBy(sql`created_at DESC`)
+            .orderBy(desc(orders.createdAt))
             .limit(50);
             
         const orderIds = salesmanOrders.map(o => o.id);
@@ -52,7 +52,9 @@ export async function GET(req: Request) {
             .from(orders)
             .where(and(eq(orders.salesmanId, salesmanId), gte(orders.createdAt, today)));
 
-        const pendingPayments = await db.select({ total: sql`SUM(total_amount)` })
+        const pendingPayments = await db.select({ 
+            total: sql<string>`SUM(${orders.totalAmount} - ${orders.paidAmount})` 
+        })
             .from(orders)
             .where(and(
                 eq(orders.salesmanId, salesmanId),
@@ -67,6 +69,12 @@ export async function GET(req: Request) {
             .orderBy(desc(notifications.createdAt))
             .limit(50);
 
+        // 6. Fetch Salesman Payments History
+        const userPayments = await db.select()
+            .from(payments)
+            .where(eq(payments.salesmanId, salesmanId))
+            .orderBy(desc(payments.createdAt));
+
         return NextResponse.json({
             success: true,
             data: {
@@ -74,6 +82,7 @@ export async function GET(req: Request) {
                 products: productsWithVariants,
                 orders: ordersWithItems,
                 notifications: userNotifications,
+                payments: userPayments,
                 stats: {
                     todayOrders: todayOrders[0]?.count || 0,
                     pendingPayments: Number(pendingPayments[0]?.total || 0)
@@ -86,6 +95,3 @@ export async function GET(req: Request) {
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }
-
-// Helper sql tag since we didn't import it for orderBy
-import { sql } from "drizzle-orm";

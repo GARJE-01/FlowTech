@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import '../domain/payment_model.dart';
 import '../data/payment_service.dart';
+import '../../order/data/order_service.dart';
 
 class PaymentDetailScreen extends ConsumerWidget {
   final String paymentId;
@@ -11,7 +14,7 @@ class PaymentDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final payments = ref.watch(paymentProvider);
-    final payment = payments.where((p) => p.paymentId == paymentId).firstOrNull;
+    final payment = payments.where((p) => p.id == paymentId).firstOrNull;
 
     if (payment == null) {
       return Scaffold(
@@ -20,127 +23,103 @@ class PaymentDetailScreen extends ConsumerWidget {
       );
     }
 
+    final order = ref.watch(orderListProvider).where((o) => o.id == payment.orderId).firstOrNull;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Payment Details')),
+      appBar: AppBar(title: const Text('Transaction Details')),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 1. Overview Card
-            Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  children: [
-                    Text('Balance Due', style: TextStyle(color: Colors.grey[600], fontSize: 14)),
-                    const SizedBox(height: 8),
-                    Text('₹${payment.balanceAmount.toStringAsFixed(0)}', style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: payment.balanceAmount > 0 ? Colors.red : Colors.green)),
-                    const SizedBox(height: 16),
-                    _buildStatusBadge(payment.status),
-                  ],
-                ),
+            // Status/Amount Header
+            Center(
+              child: Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.green.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(LucideIcons.checkCircle2, color: Colors.green, size: 48),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text('Payment Received', style: TextStyle(fontSize: 18, color: Colors.grey)),
+                  const SizedBox(height: 8),
+                  Text('₹${payment.amount.toStringAsFixed(2)}', 
+                    style: const TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: Colors.green)),
+                ],
+              ),
+            ),
+            const SizedBox(height: 40),
+
+            const Text('Transaction Info', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey.shade200),
+              ),
+              child: Column(
+                children: [
+                   _buildRow('Transaction ID', payment.id.substring(0, 8).toUpperCase()),
+                   _buildRow('Payment Mode', payment.paymentMode.name.toUpperCase()),
+                   _buildRow('Date & Time', DateFormat('dd MMM yyyy, hh:mm a').format(payment.createdAt)),
+                ],
               ),
             ),
             const SizedBox(height: 24),
 
-            // 2. Invoice Info
-            const Text('Invoice Information', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Text('Order Information', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey.shade200)),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey.shade200),
+              ),
               child: Column(
                 children: [
-                  _buildRow('Shop Name', payment.shopName),
-                  _buildRow('Invoice No', payment.invoiceId),
-                  _buildRow('Total Bill', '₹${payment.totalBillAmount.toStringAsFixed(0)}', isValueBold: true),
+                  _buildRow('Shop Name', order?.shopName ?? 'N/A'),
+                  _buildRow('Order No', '#...${payment.orderId.substring(payment.orderId.length.clamp(0, 6))}'),
                 ],
               ),
             ),
             
-            const SizedBox(height: 24),
-
-            // 3. Payment History / Info
-            const Text('Payment Status', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 12),
-             Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey.shade200)),
-              child: Column(
-                children: [
-                  _buildRow('Amount Received', '₹${payment.amountReceived.toStringAsFixed(0)}', color: Colors.green),
-                  if (payment.lastPaymentDate != null)
-                    _buildRow('Last Payment', payment.lastPaymentDate!.toString().split(' ')[0]),
-                  if (payment.lastPaymentMode != null)
-                     _buildRow('Mode', payment.lastPaymentMode!.name.toUpperCase()),
-                ],
+            const SizedBox(height: 40),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () => Navigator.of(context).pop(),
+                icon: const Icon(LucideIcons.arrowLeft),
+                label: const Text('Back to History'),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
               ),
             ),
-
-             // 4. Admin Simulation (Dev Only)
-             const SizedBox(height: 40),
-             const Divider(),
-             const Padding(
-               padding: EdgeInsets.symmetric(vertical: 8.0),
-               child: Text('Admin Simulation (Dev Only)', style: TextStyle(color: Colors.grey, fontSize: 12)),
-             ),
-             Row(
-               children: [
-                 Expanded(
-                   child: OutlinedButton(
-                     onPressed: payment.balanceAmount <= 0 ? null : () {
-                       ref.read(paymentProvider.notifier).simulatePaymentReference(payment.invoiceId, 1000, PaymentMode.cash);
-                       // Show toast/snackbar
-                     },
-                     child: const Text('Pay ₹1000'),
-                   ),
-                 ),
-                 const SizedBox(width: 12),
-                 Expanded(
-                   child: ElevatedButton(
-                     onPressed: payment.balanceAmount <= 0 ? null : () {
-                         ref.read(paymentProvider.notifier).simulatePaymentReference(payment.invoiceId, payment.balanceAmount, PaymentMode.upi);
-                     },
-                     child: const Text('Full Settle'),
-                   ),
-                 ),
-               ],
-             ),
-             TextButton(onPressed: () => ref.read(paymentProvider.notifier).resetPayment(payment.invoiceId), child: const Text('Reset Payment'))
           ],
         ),
       ),
     );
   }
 
-  Widget _buildRow(String label, String value, {bool isValueBold = false, Color? color}) {
+  Widget _buildRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 10.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: TextStyle(color: Colors.grey[600])),
-          Text(value, style: TextStyle(fontWeight: isValueBold ? FontWeight.bold : FontWeight.normal, color: color)),
+          Text(label, style: TextStyle(color: Colors.grey[600], fontSize: 14)),
+          Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
         ],
       ),
     );
   }
-  
-  Widget _buildStatusBadge(PaymentStatus status) {
-    Color color;
-    String label;
-    switch (status) {
-      case PaymentStatus.paid: color = Colors.green; label = 'PAID'; break;
-      case PaymentStatus.partiallyPaid: color = Colors.orange; label = 'PARTIALLY PAID'; break;
-      case PaymentStatus.pending: color = Colors.red; label = 'PAYMENT PENDING'; break;
-    }
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(20)),
-      child: Text(label, style: TextStyle(color: color, fontWeight: FontWeight.bold)),
-    );
-  }
 }
+

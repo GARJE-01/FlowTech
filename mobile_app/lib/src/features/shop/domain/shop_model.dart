@@ -9,6 +9,7 @@ class Shop {
   final String cityId;
   final String? gstNumber;
   final ShopStatus status;
+  final double outstandingBalance;
 
   Shop({
     required this.id,
@@ -19,6 +20,7 @@ class Shop {
     required this.cityId,
     this.gstNumber,
     this.status = ShopStatus.active,
+    this.outstandingBalance = 0.0,
   });
 
   Shop copyWith({
@@ -30,6 +32,7 @@ class Shop {
     String? cityId,
     String? gstNumber,
     ShopStatus? status,
+    double? outstandingBalance,
   }) {
     return Shop(
       id: id ?? this.id,
@@ -40,6 +43,7 @@ class Shop {
       cityId: cityId ?? this.cityId,
       gstNumber: gstNumber ?? this.gstNumber,
       status: status ?? this.status,
+      outstandingBalance: outstandingBalance ?? this.outstandingBalance,
     );
   }
 
@@ -53,6 +57,7 @@ class Shop {
       'cityId': cityId,
       'gstNumber': gstNumber,
       'status': status.index,
+      'outstandingBalance': outstandingBalance,
     };
   }
 
@@ -66,6 +71,7 @@ class Shop {
       cityId: json['cityId'],
       gstNumber: json['gstNumber'],
       status: ShopStatus.values[json['status'] ?? 0],
+      outstandingBalance: (json['outstandingBalance'] ?? 0).toDouble(),
     );
   }
 }

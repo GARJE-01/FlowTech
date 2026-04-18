@@ -41,9 +41,9 @@ class InvoiceScreen extends ConsumerWidget {
             tooltip: 'View Payment Status',
             onPressed: () {
                // We would look up payment by order.id ideally, but for now mock navigation
-               final payment = ref.read(paymentProvider).where((p) => p.invoiceId == order.id).firstOrNull;
+               final payment = ref.read(paymentProvider).where((p) => p.orderId == order.id).firstOrNull;
                if (payment != null) {
-                 context.push('/payment-details/${payment.paymentId}');
+                 context.push('/payment-details/${payment.id}');
                } else {
                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No payment record found for this order')));
                  context.push('/payments'); 

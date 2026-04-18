@@ -73,6 +73,7 @@ export const shops = pgTable("shops", {
     gstNumber: text("gst_number"),
     address: text("address").notNull(),
     isActive: boolean("is_active").default(true).notNull(),
+    outstandingBalance: real("outstanding_balance").default(0).notNull(),
     createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -111,6 +112,7 @@ export const orders = pgTable("orders", {
     salesmanId: text("salesman_id").references(() => user.id, { onDelete: 'cascade' }),
     shopId: integer("shop_id").references(() => shops.id, { onDelete: 'cascade' }).notNull(),
     totalAmount: real("total_amount").notNull(),
+    paidAmount: real("paid_amount").default(0).notNull(),
     status: text("status").default("pending"), // pending, approved, rejected, delivered
     isPaid: boolean("is_paid").default(false).notNull(),
     createdAt: timestamp("created_at").defaultNow(),
@@ -143,4 +145,15 @@ export const notifications = pgTable("notifications", {
     isNew: boolean("is_new").default(true).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+export const payments = pgTable("payments", {
+    id: text("id").primaryKey(), // Using uuid
+    orderId: text("order_id").references(() => orders.id, { onDelete: 'cascade' }).notNull(),
+    shopId: integer("shop_id").references(() => shops.id, { onDelete: 'cascade' }).notNull(),
+    salesmanId: text("salesman_id").references(() => user.id, { onDelete: 'cascade' }).notNull(),
+    amount: real("amount").notNull(),
+    paymentMode: text("payment_mode").notNull(), // 'cash', 'upi', 'bank', etc.
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 

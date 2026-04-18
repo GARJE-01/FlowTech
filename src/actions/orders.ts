@@ -2,11 +2,10 @@
 "use server"
 
 import { db } from "@/db";
-import { orders, orderItems, productVariants, stockLedger } from "@/db/schema";
+import { orders, orderItems, productVariants, stockLedger, shops } from "@/db/schema";
 import { revalidatePath } from "next/cache";
 import { eq, sql } from "drizzle-orm";
-import { auth } from "@/lib/auth"; // Access session if needed server-side, but usually passed or context
-import { createNotification } from "./notifications";
+import { createNotification } from "@/lib/notifications";
 
 export async function createOrder(data: {
     items: { variantId: number; quantity: number; price: number }[];
@@ -38,6 +37,9 @@ export async function createOrder(data: {
                     price: item.price,
                 });
             }
+
+            // Optional: Increase shop balance here if you want to track pending debt
+            // For now, let's keep it consistent with "Approved" orders being the official debt.
         });
 
         revalidatePath("/admin/orders");
@@ -74,8 +76,6 @@ export async function approveOrder(orderId: string, approverId: string) {
             const items = await tx.select().from(orderItems).where(eq(orderItems.orderId, orderId));
 
             for (const item of items) {
-                // Check stock first? Assuming forced deduction or check in UI.
-
                 // Update Variant Stock
                 await tx.update(productVariants)
                     .set({
@@ -86,11 +86,20 @@ export async function approveOrder(orderId: string, approverId: string) {
                 // Add to Stock Ledger
                 await tx.insert(stockLedger).values({
                     variantId: item.variantId,
-                    changeAmount: -item.quantity, // Negative for OUT
+                    changeAmount: -item.quantity,
                     type: "ORDER",
                     referenceId: orderId,
                     notes: "Order Approved",
                 });
+            }
+
+            // 4. Increase Shop's Outstanding Balance
+            if (orderRecord) {
+                await tx.update(shops)
+                    .set({
+                        outstandingBalance: sql`${shops.outstandingBalance} + ${orderRecord.totalAmount}`
+                    })
+                    .where(eq(shops.id, orderRecord.shopId));
             }
         });
 

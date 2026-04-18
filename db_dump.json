@@ -1,0 +1,164 @@
+{
+  "orders": [
+    {
+      "id": "ORD-20265028",
+      "salesman_id": "B2bqFbVhmIpmJqGgsgvNHLmxMVTdhcGA",
+      "total_amount": 150,
+      "status": "approved",
+      "created_at": "2026-03-11T10:18:44.209Z",
+      "updated_at": "2026-03-11T11:21:32.058Z",
+      "approver_id": "y8psVdU8gRq0jmG1ekdcSqkU9TRUC1lQ",
+      "is_paid": true,
+      "shop_id": 2,
+      "paid_amount": 150
+    },
+    {
+      "id": "ORD-20262907",
+      "salesman_id": "B2bqFbVhmIpmJqGgsgvNHLmxMVTdhcGA",
+      "total_amount": 4550,
+      "status": "approved",
+      "created_at": "2026-03-11T08:26:07.829Z",
+      "updated_at": "2026-03-11T11:21:20.631Z",
+      "approver_id": "y8psVdU8gRq0jmG1ekdcSqkU9TRUC1lQ",
+      "is_paid": true,
+      "shop_id": 1,
+      "paid_amount": 4550
+    },
+    {
+      "id": "ORD-20268982",
+      "salesman_id": "B2bqFbVhmIpmJqGgsgvNHLmxMVTdhcGA",
+      "total_amount": 440,
+      "status": "rejected",
+      "created_at": "2026-03-11T08:22:21.957Z",
+      "updated_at": "2026-03-11T08:23:05.829Z",
+      "approver_id": "y8psVdU8gRq0jmG1ekdcSqkU9TRUC1lQ",
+      "is_paid": false,
+      "shop_id": 2,
+      "paid_amount": 0
+    },
+    {
+      "id": "ORD-20262060",
+      "salesman_id": "B2bqFbVhmIpmJqGgsgvNHLmxMVTdhcGA",
+      "total_amount": 790,
+      "status": "approved",
+      "created_at": "2026-03-11T08:07:09.956Z",
+      "updated_at": "2026-03-11T11:21:44.447Z",
+      "approver_id": "y8psVdU8gRq0jmG1ekdcSqkU9TRUC1lQ",
+      "is_paid": true,
+      "shop_id": 3,
+      "paid_amount": 790
+    },
+    {
+      "id": "ORD-20260340",
+      "salesman_id": "y8psVdU8gRq0jmG1ekdcSqkU9TRUC1lQ",
+      "total_amount": 1600,
+      "status": "approved",
+      "created_at": "2026-03-11T05:56:00.770Z",
+      "updated_at": "2026-03-11T05:56:22.821Z",
+      "approver_id": "y8psVdU8gRq0jmG1ekdcSqkU9TRUC1lQ",
+      "is_paid": false,
+      "shop_id": 1,
+      "paid_amount": 0
+    },
+    {
+      "id": "ORD-20260846",
+      "salesman_id": "y8psVdU8gRq0jmG1ekdcSqkU9TRUC1lQ",
+      "total_amount": 13250,
+      "status": "rejected",
+      "created_at": "2026-03-11T05:53:49.131Z",
+      "updated_at": "2026-03-11T05:54:05.703Z",
+      "approver_id": "y8psVdU8gRq0jmG1ekdcSqkU9TRUC1lQ",
+      "is_paid": false,
+      "shop_id": 2,
+      "paid_amount": 0
+    },
+    {
+      "id": "ORD-20264841",
+      "salesman_id": "y8psVdU8gRq0jmG1ekdcSqkU9TRUC1lQ",
+      "total_amount": 2100,
+      "status": "approved",
+      "created_at": "2026-03-11T03:48:44.976Z",
+      "updated_at": "2026-03-11T05:40:13.057Z",
+      "approver_id": "y8psVdU8gRq0jmG1ekdcSqkU9TRUC1lQ",
+      "is_paid": false,
+      "shop_id": 1,
+      "paid_amount": 0
+    }
+  ],
+  "payments": [
+    {
+      "id": "44b25e9a-0c3a-4d0b-a301-aa80fd01a569",
+      "order_id": "ORD-20262060",
+      "shop_id": 3,
+      "salesman_id": "B2bqFbVhmIpmJqGgsgvNHLmxMVTdhcGA",
+      "amount": 790,
+      "payment_mode": "credit",
+      "created_at": "2026-03-11T11:21:43.162Z"
+    },
+    {
+      "id": "937341c4-9ccc-4602-b21e-e4061112eac2",
+      "order_id": "ORD-20265028",
+      "shop_id": 2,
+      "salesman_id": "B2bqFbVhmIpmJqGgsgvNHLmxMVTdhcGA",
+      "amount": 50,
+      "payment_mode": "cash",
+      "created_at": "2026-03-11T11:21:30.596Z"
+    },
+    {
+      "id": "7c91bb23-551f-48fa-b44e-8bcbde0c309e",
+      "order_id": "ORD-20262907",
+      "shop_id": 1,
+      "salesman_id": "B2bqFbVhmIpmJqGgsgvNHLmxMVTdhcGA",
+      "amount": 4550,
+      "payment_mode": "banktransfer",
+      "created_at": "2026-03-11T11:21:19.559Z"
+    },
+    {
+      "id": "7010b35b-c235-40f8-8b11-7ffe16a00b20",
+      "order_id": "ORD-20265028",
+      "shop_id": 2,
+      "salesman_id": "B2bqFbVhmIpmJqGgsgvNHLmxMVTdhcGA",
+      "amount": 100,
+      "payment_mode": "cash",
+      "created_at": "2026-03-11T11:20:59.997Z"
+    }
+  ],
+  "shops": [
+    {
+      "id": 1,
+      "shop_name": "bhaya pan shop",
+      "owner_name": "Sandeep Bhaya",
+      "city": "jaigad",
+      "mobile_number": "8521364895",
+      "gst_number": "27AAAAA0000A1Z5",
+      "address": "near shanti dhabha, Hatkhamba ",
+      "created_at": "2026-03-11T04:24:20.775Z",
+      "is_active": true,
+      "outstanding_balance": -4550
+    },
+    {
+      "id": 2,
+      "shop_name": "Swaad n sip",
+      "owner_name": "Swanad",
+      "city": "Ratnagiri",
+      "mobile_number": "8745691235",
+      "gst_number": "27AAAAA0000A1E3",
+      "address": "Near FAMT",
+      "created_at": "2026-03-11T04:45:41.476Z",
+      "is_active": true,
+      "outstanding_balance": -150
+    },
+    {
+      "id": 3,
+      "shop_name": "SHUBHAM KIRANA",
+      "owner_name": "SHUBHAM",
+      "city": "1",
+      "mobile_number": "7589632158",
+      "gst_number": "23EVDBYTND45FD",
+      "address": "CHANDERIA",
+      "created_at": "2026-03-11T08:06:44.418Z",
+      "is_active": true,
+      "outstanding_balance": -790
+    }
+  ]
+}

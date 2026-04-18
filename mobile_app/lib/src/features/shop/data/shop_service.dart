@@ -123,6 +123,17 @@ class ShopService extends StateNotifier<List<Shop>> {
   Future<bool> deactivateShop(String id) async {
     return await updateShopStatus(id, ShopStatus.inactive);
   }
+
+  void updateShopBalance(String id, double delta) {
+    state = [
+      for (final shop in state)
+        if (shop.id == id)
+          shop.copyWith(outstandingBalance: shop.outstandingBalance + delta)
+        else
+          shop
+    ];
+    _storage.saveShops(state);
+  }
 }
 
 final shopProvider = StateNotifierProvider<ShopService, List<Shop>>((ref) {

@@ -1,82 +1,77 @@
-
-enum PaymentStatus { pending, partiallyPaid, paid }
 enum PaymentMode { cash, upi, bankTransfer, check, credit }
 
 class Payment {
-  final String paymentId;
-  final String invoiceId;
+  final String id;
+  final String orderId;
   final String shopId;
-  final String shopName;
-  final double totalBillAmount;
-  final double amountReceived;
-  final DateTime? lastPaymentDate;
-  final PaymentMode? lastPaymentMode;
-  
-  // Computed
-  double get balanceAmount => totalBillAmount - amountReceived;
-  
-  PaymentStatus get status {
-    if (amountReceived >= totalBillAmount) return PaymentStatus.paid;
-    if (amountReceived > 0) return PaymentStatus.partiallyPaid;
-    return PaymentStatus.pending;
-  }
+  final String salesmanId;
+  final double amount;
+  final PaymentMode paymentMode;
+  final DateTime createdAt;
 
   Payment({
-    required this.paymentId,
-    required this.invoiceId,
+    required this.id,
+    required this.orderId,
     required this.shopId,
-    required this.shopName,
-    required this.totalBillAmount,
-    this.amountReceived = 0.0,
-    this.lastPaymentDate,
-    this.lastPaymentMode,
+    required this.salesmanId,
+    required this.amount,
+    required this.paymentMode,
+    required this.createdAt,
   });
 
   Payment copyWith({
-    String? paymentId,
-    String? invoiceId,
+    String? id,
+    String? orderId,
     String? shopId,
-    String? shopName,
-    double? totalBillAmount,
-    double? amountReceived,
-    DateTime? lastPaymentDate,
-    PaymentMode? lastPaymentMode,
+    String? salesmanId,
+    double? amount,
+    PaymentMode? paymentMode,
+    DateTime? createdAt,
   }) {
     return Payment(
-      paymentId: paymentId ?? this.paymentId,
-      invoiceId: invoiceId ?? this.invoiceId,
+      id: id ?? this.id,
+      orderId: orderId ?? this.orderId,
       shopId: shopId ?? this.shopId,
-      shopName: shopName ?? this.shopName,
-      totalBillAmount: totalBillAmount ?? this.totalBillAmount,
-      amountReceived: amountReceived ?? this.amountReceived,
-      lastPaymentDate: lastPaymentDate ?? this.lastPaymentDate,
-      lastPaymentMode: lastPaymentMode ?? this.lastPaymentMode,
+      salesmanId: salesmanId ?? this.salesmanId,
+      amount: amount ?? this.amount,
+      paymentMode: paymentMode ?? this.paymentMode,
+      createdAt: createdAt ?? this.createdAt,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'paymentId': paymentId,
-      'invoiceId': invoiceId,
+      'id': id,
+      'orderId': orderId,
       'shopId': shopId,
-      'shopName': shopName,
-      'totalBillAmount': totalBillAmount,
-      'amountReceived': amountReceived,
-      'lastPaymentDate': lastPaymentDate?.toIso8601String(),
-      'lastPaymentMode': lastPaymentMode?.index,
+      'salesmanId': salesmanId,
+      'amount': amount,
+      'paymentMode': paymentMode.name,
+      'createdAt': createdAt.toIso8601String(),
     };
   }
 
   factory Payment.fromJson(Map<String, dynamic> json) {
     return Payment(
-      paymentId: json['paymentId'],
-      invoiceId: json['invoiceId'],
-      shopId: json['shopId'],
-      shopName: json['shopName'],
-      totalBillAmount: json['totalBillAmount'],
-      amountReceived: json['amountReceived'],
-      lastPaymentDate: json['lastPaymentDate'] != null ? DateTime.parse(json['lastPaymentDate']) : null,
-      lastPaymentMode: json['lastPaymentMode'] != null ? PaymentMode.values[json['lastPaymentMode']] : null,
+      id: json['id'],
+      orderId: json['orderId'] ?? json['order_id'],
+      shopId: json['shopId']?.toString() ?? json['shop_id']?.toString() ?? '',
+      salesmanId: json['salesmanId'] ?? json['salesman_id'],
+      amount: (json['amount'] ?? 0).toDouble(),
+      paymentMode: _parsePaymentMode(json['paymentMode'] ?? json['payment_mode']),
+      createdAt: DateTime.parse(json['createdAt'] ?? json['created_at']),
     );
+  }
+
+  static PaymentMode _parsePaymentMode(String mode) {
+    switch (mode.toLowerCase()) {
+      case 'cash': return PaymentMode.cash;
+      case 'upi': return PaymentMode.upi;
+      case 'bank':
+      case 'banktransfer': return PaymentMode.bankTransfer;
+      case 'check': return PaymentMode.check;
+      case 'credit': return PaymentMode.credit;
+      default: return PaymentMode.cash;
+    }
   }
 }

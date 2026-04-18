@@ -6,16 +6,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../storage/storage_service.dart';
 
 class ApiClient {
-  // Use http://10.0.2.2:3000 for Android Emulator
-  // Use http://localhost:3000 for iOS Emulator or Windows/Web
-  String get baseUrl {
-    if (kIsWeb) return "http://localhost:3000/api/mobile";
-    if (defaultTargetPlatform == TargetPlatform.android) {
-       return "http://192.168.1.45:3000/api/mobile";
-    }
-    return "http://localhost:3000/api/mobile";
-    
-  }
+  // ─── Production URL (Vercel) ───────────────────────────────────────────────
+  // Update this URL after deploying to Vercel.
+  static const String _productionUrl = "https://YOUR-APP.vercel.app/api/mobile";
+
+  // ─── Local Dev URLs (uncomment when testing locally) ──────────────────────
+  // Android Emulator:  "http://10.0.2.2:3000/api/mobile"
+  // Physical Android:  "http://172.26.60.252:3000/api/mobile"
+  // iOS / Web:         "http://localhost:3000/api/mobile"
+
+  String get baseUrl => _productionUrl;
 
 
   final StorageService _storageService;

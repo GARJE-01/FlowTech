@@ -34,6 +34,8 @@ export default async function OrdersPage() {
                                 <TableHead>Salesman</TableHead>
                                 <TableHead>Status</TableHead>
                                 <TableHead>Amount</TableHead>
+                                <TableHead>Paid</TableHead>
+                                <TableHead>Balance</TableHead>
                                 <TableHead>Date</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
@@ -55,6 +57,8 @@ export default async function OrdersPage() {
                                         </Badge>
                                     </TableCell>
                                     <TableCell>₹{order.totalAmount.toFixed(2)}</TableCell>
+                                    <TableCell className="text-emerald-600">₹{order.paidAmount?.toFixed(2) || "0.00"}</TableCell>
+                                    <TableCell className="text-orange-600 font-bold">₹{(order.totalAmount - (order.paidAmount || 0)).toFixed(2)}</TableCell>
                                     <TableCell>{order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "-"}</TableCell>
                                     <TableCell className="text-right">
                                         <Button variant="ghost" size="sm" asChild>

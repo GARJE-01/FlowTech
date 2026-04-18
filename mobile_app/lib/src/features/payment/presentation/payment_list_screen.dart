@@ -1,199 +1,93 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../data/payment_service.dart';
 import '../domain/payment_model.dart';
+import '../../order/data/order_service.dart';
+import '../../order/domain/order_model.dart'; // Added missing import
 
-class PaymentListScreen extends ConsumerStatefulWidget {
+class PaymentListScreen extends ConsumerWidget {
   const PaymentListScreen({super.key});
 
   @override
-  ConsumerState<PaymentListScreen> createState() => _PaymentListScreenState();
-}
-
-class _PaymentListScreenState extends ConsumerState<PaymentListScreen> with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  final TextEditingController _searchController = TextEditingController();
-  String _searchQuery = '';
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 4, vsync: this);
-  }
-  
-  @override
-  void dispose() {
-    _tabController.dispose();
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final allPayments = ref.watch(paymentProvider);
-    
-    // Filter logic
-    List<Payment> filteredPayments = _filterPayments(allPayments, _tabController.index);
-    filteredPayments = filteredPayments.where((p) => 
-       p.shopName.toLowerCase().contains(_searchQuery.toLowerCase()) || 
-       p.invoiceId.toLowerCase().contains(_searchQuery.toLowerCase())
-    ).toList();
+    final allOrders = ref.watch(orderListProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Payments'),
-        bottom: TabBar(
-          controller: _tabController,
-          onTap: (index) => setState(() {}),
-          isScrollable: true,
-          tabs: const [
-            Tab(text: 'All'),
-            Tab(text: 'Pending'),
-            Tab(text: 'Partially Paid'),
-            Tab(text: 'Paid'),
-          ],
-        ),
+        title: const Text('Payment History'),
       ),
-      body: Column(
-        children: [
-          // Search Bar
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: 'Search Shop or Invoice #',
-                prefixIcon: const Icon(LucideIcons.search),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                filled: true,
-                fillColor: Colors.grey[100],
+      body: allPayments.isEmpty
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                   Icon(LucideIcons.history, size: 64, color: Colors.grey[300]),
+                   const SizedBox(height: 16),
+                   Text('No payment transactions found.', style: TextStyle(color: Colors.grey[500], fontSize: 16)),
+                ],
               ),
-              onChanged: (val) {
-                setState(() {
-                   _searchQuery = val;
-                });
+            )
+          : ListView.separated(
+              padding: const EdgeInsets.all(16),
+              itemCount: allPayments.length,
+              separatorBuilder: (_, __) => const SizedBox(height: 12),
+              itemBuilder: (context, index) {
+                final payment = allPayments[index];
+                final order = allOrders.where((o) => o.id == payment.orderId).firstOrNull;
+                
+                return _buildTransactionCard(context, payment, order);
               },
             ),
-          ),
-          
-          // List
-          Expanded(
-            child: filteredPayments.isEmpty 
-            ? const Center(child: Text('No payments found'))
-            : ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: filteredPayments.length,
-                itemBuilder: (context, index) {
-                  final payment = filteredPayments[index];
-                  return _buildPaymentCard(context, payment);
-                },
-              ),
-          ),
-        ],
-      ),
     );
   }
 
-  // --- Filter Helpers ---
-  List<Payment> _filterPayments(List<Payment> all, int tabIndex) {
-    switch (tabIndex) {
-      case 1: return all.where((p) => p.status == PaymentStatus.pending).toList();
-      case 2: return all.where((p) => p.status == PaymentStatus.partiallyPaid).toList();
-      case 3: return all.where((p) => p.status == PaymentStatus.paid).toList();
-      default: return all;
-    }
-  }
-
-  Widget _buildPaymentCard(BuildContext context, Payment payment) {
+  Widget _buildTransactionCard(BuildContext context, Payment payment, Order? order) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: InkWell(
-        onTap: () {
-          context.push('/payment-details/${payment.paymentId}');
-        },
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                   Column(
-                     crossAxisAlignment: CrossAxisAlignment.start,
-                     children: [
-                       Text(payment.shopName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                       Text(payment.invoiceId, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
-                     ],
-                   ),
-                   _buildStatusBadge(payment.status),
-                ],
-              ),
-              const SizedBox(height: 12),
-              const Divider(),
-              const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text('Total Bill', style: TextStyle(color: Colors.grey, fontSize: 11)),
-                      Text('₹${payment.totalBillAmount.toStringAsFixed(0)}', style: const TextStyle(fontWeight: FontWeight.w600)),
-                    ],
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      const Text('Balance Due', style: TextStyle(color: Colors.grey, fontSize: 11)),
-                      Text(
-                        '₹${payment.balanceAmount.toStringAsFixed(0)}', 
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold, 
-                          color: payment.balanceAmount > 0 ? Colors.red : Colors.green
-                        )
-                      ),
-                    ],
-                  ),
-                ],
-              )
-            ],
+      elevation: 1,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12), 
+        side: BorderSide(color: Colors.grey.shade200),
+      ),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        leading: Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: Colors.green.withOpacity(0.1),
+            shape: BoxShape.circle,
           ),
+          child: const Icon(LucideIcons.arrowDownLeft, color: Colors.green, size: 20),
         ),
+        title: Text(
+          order?.shopName ?? 'Order #...${payment.orderId.substring(payment.orderId.length.clamp(0, 6))}',
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 4),
+            Text('Via ${payment.paymentMode.name.toUpperCase()}', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+            Text(DateFormat('MMM dd, yyyy • hh:mm a').format(payment.createdAt), style: TextStyle(fontSize: 11, color: Colors.grey[500])),
+          ],
+        ),
+        trailing: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Text(
+              '₹${payment.amount.toStringAsFixed(0)}',
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.green),
+            ),
+            const Icon(LucideIcons.chevronRight, size: 16, color: Colors.grey),
+          ],
+        ),
+        onTap: () => context.push('/payment-details/${payment.id}'),
       ),
-    );
-  }
-
-  Widget _buildStatusBadge(PaymentStatus status) {
-    Color color;
-    String label;
-    switch (status) {
-      case PaymentStatus.paid: 
-        color = Colors.green; 
-        label = 'PAID'; 
-        break;
-      case PaymentStatus.partiallyPaid: 
-        color = Colors.orange; 
-        label = 'PARTIAL'; 
-        break;
-      case PaymentStatus.pending: 
-        color = Colors.red; 
-        label = 'PENDING'; 
-        break;
-    }
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.5)),
-      ),
-      child: Text(label, style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 10)),
     );
   }
 }
+
