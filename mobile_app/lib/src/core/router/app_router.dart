@@ -189,14 +189,17 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       GoRoute(
         path: '/payment-details/:id',
+        parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => PaymentDetailScreen(paymentId: state.pathParameters['id']!),
       ),
       GoRoute(
         path: '/record-payment/:orderId',
+        parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => RecordPaymentScreen(orderId: state.pathParameters['orderId']!),
       ),
       GoRoute(
         path: '/notifications/:id',
+        parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => NotificationDetailScreen(notificationId: state.pathParameters['id']!),
       ),
 

@@ -4,6 +4,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
 import '../../order/data/order_service.dart';
 import '../../order/domain/order_model.dart';
+import '../../auth/data/auth_service.dart';
 import '../../shop/data/shop_service.dart';
 import '../../payment/data/payment_service.dart';
 import 'package:go_router/go_router.dart';
@@ -41,13 +42,20 @@ class InvoiceScreen extends ConsumerWidget {
             icon: const Icon(LucideIcons.indianRupee),
             tooltip: 'View Payment Status',
             onPressed: () {
-               // We would look up payment by order.id ideally, but for now mock navigation
-               final payment = ref.read(paymentProvider).where((p) => p.orderId == order.id).firstOrNull;
-               if (payment != null) {
-                 context.push('/payment-details/${payment.id}');
+               final orderPayments = ref.read(paymentProvider).where((p) => p.orderId == order.id).toList();
+               if (orderPayments.isNotEmpty) {
+                 showModalBottomSheet(
+                   context: context,
+                   shape: const RoundedRectangleBorder(
+                     borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                   ),
+                   builder: (context) {
+                     return _buildPaymentHistorySheet(context, orderPayments, order);
+                   }
+                 );
                } else {
                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No payment record found for this order')));
-                 context.push('/payments'); 
+                 context.go('/payments'); 
                }
             },
           ),
@@ -137,7 +145,12 @@ class InvoiceScreen extends ConsumerWidget {
                           const Text('DETAILS:', style: TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.bold)),
                           const SizedBox(height: 4),
                           Text('Order ID: ...${order.id.substring(order.id.length - 6)}', style: const TextStyle(fontSize: 12)),
-                          const Text('Salesman: User', style: TextStyle(fontSize: 12)),
+                          Consumer(
+                            builder: (context, ref, _) {
+                               final userName = ref.watch(authProvider).user?.name ?? 'Unknown Salesman';
+                               return Text('Salesman: $userName', style: const TextStyle(fontSize: 12));
+                            }
+                          ),
                           const Text('Terms: Credit (7 Days)', style: TextStyle(fontSize: 12)),
                         ],
                       ),
@@ -228,4 +241,57 @@ class InvoiceScreen extends ConsumerWidget {
   }
 
 // Placeholder for _showShareOptions if implemented later
+
+  Widget _buildPaymentHistorySheet(BuildContext context, List<dynamic> payments, Order order) {
+    payments.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    
+    return Container(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text('Payment History', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              IconButton(icon: const Icon(LucideIcons.x), onPressed: () => Navigator.of(context).pop()),
+            ],
+          ),
+          Text(
+            'Remaining Balance: ₹${order.balanceAmount.toStringAsFixed(0)}',
+            style: TextStyle(fontSize: 14, color: order.balanceAmount > 0 ? Colors.red : Colors.green),
+          ),
+          const Divider(),
+          const SizedBox(height: 10),
+          Flexible(
+            child: ListView.separated(
+              shrinkWrap: true,
+              itemCount: payments.length,
+              separatorBuilder: (_, __) => const Divider(),
+              itemBuilder: (context, index) {
+                final payment = payments[index];
+                return ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: CircleAvatar(
+                    backgroundColor: Colors.green.withOpacity(0.1),
+                    child: const Icon(LucideIcons.checkCircle2, color: Colors.green),
+                  ),
+                  title: Text('Amount: ₹${payment.amount.toStringAsFixed(0)}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                  subtitle: Text(DateFormat('dd MMM yy, hh:mm a').format(payment.createdAt)),
+                  trailing: OutlinedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      context.push('/payment-details/${payment.id}');
+                    },
+                    child: const Text("View"),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

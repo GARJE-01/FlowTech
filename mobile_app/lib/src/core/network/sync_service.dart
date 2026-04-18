@@ -85,7 +85,7 @@ class SyncService {
         return Order(
           id: o['id'],
           shopId: o['shopId'].toString(),
-          shopName: "Shop #${o['shopId']}", // We'd need a join or map lookups for real names from synced shops
+          shopName: shops.firstWhere((s) => s.id == o['shopId'].toString(), orElse: () => Shop(id: o['shopId'].toString(), name: 'Unknown Shop', ownerName: '', address: '', mobileNumber: '', cityId: '')).name,
           cityId: "1",
           items: orderItems,
           totalAmount: o['totalAmount'].toDouble(),

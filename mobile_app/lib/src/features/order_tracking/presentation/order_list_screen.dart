@@ -6,6 +6,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../order/domain/order_model.dart';
 import '../../order/data/order_service.dart';
 import '../../city/data/city_service.dart';
+import '../../../core/network/sync_service.dart';
 
 class OrderListScreen extends ConsumerStatefulWidget {
   const OrderListScreen({super.key});
@@ -50,14 +51,19 @@ class _OrderListScreenState extends ConsumerState<OrderListScreen> with SingleTi
           ],
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildOrderList(cityOrders, OrderStatus.draft),
-          _buildOrderList(cityOrders, OrderStatus.pending),
-          _buildOrderList(cityOrders, OrderStatus.approved),
-          _buildOrderList(cityOrders, OrderStatus.rejected),
-        ],
+      body: RefreshIndicator(
+        onRefresh: () async {
+            await ref.read(syncServiceProvider).performFullSync();
+        },
+        child: TabBarView(
+          controller: _tabController,
+          children: [
+            _buildOrderList(cityOrders, OrderStatus.draft),
+            _buildOrderList(cityOrders, OrderStatus.pending),
+            _buildOrderList(cityOrders, OrderStatus.approved),
+            _buildOrderList(cityOrders, OrderStatus.rejected),
+          ],
+        ),
       ),
     );
   }
