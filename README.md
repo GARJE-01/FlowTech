@@ -1,36 +1,76 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# FlowTech — Distribution & Sales Management System
+
+> ✅ **Verification:** This README was updated on **April 23, 2026** to confirm repo identity.
+
+FlowTech is a full-stack distribution and sales management platform with an **Admin Dashboard** (Next.js) and a **Mobile App** (Flutter) for salesmen and delivery personnel.
+
+## Tech Stack
+
+| Component | Technology |
+|---|---|
+| Admin Dashboard | Next.js 16, React, TypeScript |
+| Styling | TailwindCSS, shadcn/ui |
+| Database | PostgreSQL (via Drizzle ORM) |
+| Auth | Better-Auth |
+| Mobile App | Flutter / Dart |
+| Deployment | Vercel (Dashboard) |
+
+## Features
+
+### Admin Dashboard
+- 📊 Dashboard with sales overview and charts
+- 📦 Inventory management (products, variants, stock ledger)
+- 🛒 Order management (create, approve, track, deliver)
+- 🏪 Shop management
+- 👥 Salesman management
+- 🏭 Supplier management
+- 💰 Payment tracking
+- 📄 CSV import for products and suppliers
+
+### Mobile App
+- 🔐 Authentication (login/signup)
+- 🏙️ City-based shop filtering
+- 📋 Order creation and tracking
+- 🧾 Invoice generation
+- 💵 Payment collection
+- 📊 Reports and analytics
+- 🔔 Notifications
+- 👤 Profile management
 
 ## Getting Started
 
-First, run the development server:
+### Dashboard
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to view the dashboard.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Mobile App
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+cd mobile_app
+flutter pub get
+flutter run
+```
 
-## Learn More
+## Project Structure
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+FlowTech/
+├── src/                  # Next.js Dashboard
+│   ├── app/              # App routes (admin, api, login)
+│   ├── components/       # UI components
+│   ├── db/               # Database schema & queries
+│   ├── actions/          # Server actions
+│   ├── hooks/            # Custom React hooks
+│   └── lib/              # Utilities
+├── mobile_app/           # Flutter Mobile App
+│   └── lib/src/
+│       ├── core/         # Router, widgets, services
+│       └── features/     # Feature modules
+├── drizzle/              # Database migrations
+└── scripts/              # Utility scripts
+```
