@@ -105,6 +105,7 @@ export async function approveOrder(orderId: string, approverId: string) {
 
         revalidatePath("/admin/orders");
         revalidatePath("/admin/inventory");
+        revalidatePath("/admin"); // Refresh dashboard Recent Sales & revenue chart
 
         // Notify Salesman
         const [orderData] = await db.select({ salesmanId: orders.salesmanId }).from(orders).where(eq(orders.id, orderId));
@@ -132,6 +133,7 @@ export async function rejectOrder(orderId: string, approverId: string) {
             .where(eq(orders.id, orderId));
 
         revalidatePath("/admin/orders");
+        revalidatePath("/admin"); // Refresh dashboard Recent Sales so rejected orders disappear
 
         // Notify Salesman
         const [orderData] = await db.select({ salesmanId: orders.salesmanId }).from(orders).where(eq(orders.id, orderId));
