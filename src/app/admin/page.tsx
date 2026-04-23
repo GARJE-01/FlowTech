@@ -7,8 +7,10 @@ import { orders, productVariants, user, shops } from "@/db/schema";
 import { eq, sum, count, desc, sql, gte, and, ne } from "drizzle-orm";
 
 export default async function AdminDashboard() {
-    // 1. Total Revenue (delivered orders)
-    const revenueResult = await db.select({ total: sum(orders.totalAmount) }).from(orders).where(eq(orders.status, 'delivered'));
+    // 1. Total Revenue (approved + delivered orders)
+    const revenueResult = await db.select({ total: sum(orders.totalAmount) }).from(orders).where(
+        sql`${orders.status} IN ('approved', 'delivered')`
+    );
     const totalRevenue = Number(revenueResult[0]?.total || 0);
 
     // 2. Pending Orders
@@ -51,7 +53,7 @@ export default async function AdminDashboard() {
             to_char(created_at, 'Mon') as name,
             SUM(total_amount) as total
         FROM orders
-        WHERE status = 'delivered' AND created_at >= date_trunc('year', CURRENT_DATE)
+        WHERE status IN ('approved', 'delivered') AND created_at >= date_trunc('year', CURRENT_DATE)
         GROUP BY name, date_trunc('month', created_at)
         ORDER BY date_trunc('month', created_at)
     `);
