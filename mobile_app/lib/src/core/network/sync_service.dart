@@ -37,7 +37,7 @@ class SyncService {
         ownerName: s['ownerName'],
         mobileNumber: s['mobileNumber'],
         address: s['address'],
-        cityId: "1", // Manual mapping for now, or update schema
+        cityId: s['city']?.toString() ?? "1", // use dynamically mapped city from DB
         gstNumber: s['gstNumber'],
         status: s['isActive'] ? ShopStatus.active : ShopStatus.inactive,
         outstandingBalance: (s['outstandingBalance'] ?? s['outstanding_balance'] ?? 0).toDouble(),
@@ -86,7 +86,7 @@ class SyncService {
           id: o['id'],
           shopId: o['shopId'].toString(),
           shopName: shops.firstWhere((s) => s.id == o['shopId'].toString(), orElse: () => Shop(id: o['shopId'].toString(), name: 'Unknown Shop', ownerName: '', address: '', mobileNumber: '', cityId: '')).name,
-          cityId: "1",
+          cityId: shops.firstWhere((s) => s.id == o['shopId'].toString(), orElse: () => Shop(id: o['shopId'].toString(), name: 'Unknown Shop', ownerName: '', address: '', mobileNumber: '', cityId: '1')).cityId,
           items: orderItems,
           totalAmount: o['totalAmount'].toDouble(),
           subtotalAmount: o['totalAmount'].toDouble() / 1.18, // Rough reverse engineer since subtotal/gst not saved separately in simple DB schema

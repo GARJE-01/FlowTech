@@ -39,17 +39,13 @@ final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
-  final cityState = ref.watch(cityProvider);
 
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
     initialLocation: '/login',
-    refreshListenable: ListenableMerge([
-       ValueNotifier(authState),
-       ValueNotifier(cityState),
-    ]), 
     redirect: (context, state) {
       final isLoggedIn = authState.isAuthenticated;
+      final cityState = ref.read(cityProvider);
       final hasCitySelected = cityState.hasCitySelected;
       final isLoggingIn = state.uri.toString() == '/login';
       final isSelectingCity = state.uri.toString() == '/city-selection';

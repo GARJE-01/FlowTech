@@ -35,7 +35,7 @@ class FlowTechApp extends ConsumerWidget {
     final router = ref.watch(routerProvider);
 
     return MaterialApp.router(
-      title: 'FlowTech Salesman',
+      title: 'FlowTech',
       theme: AppTheme.lightTheme,
       routerConfig: router,
       debugShowCheckedModeBanner: false,

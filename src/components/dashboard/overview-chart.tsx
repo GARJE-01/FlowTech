@@ -27,6 +27,13 @@ export function OverviewChart({ data }: OverviewChartProps) {
                 <Tooltip 
                     cursor={{fill: 'transparent'}}
                     formatter={(value: any) => [`₹${value}`, 'Revenue']}
+                    contentStyle={{ 
+                        borderRadius: "8px", 
+                        border: "1px solid hsl(var(--border))", 
+                        backgroundColor: "hsl(var(--background))", 
+                        color: "hsl(var(--foreground))" 
+                    }}
+                    itemStyle={{ color: "hsl(var(--foreground))" }}
                 />
                 <Bar
                     dataKey="total"

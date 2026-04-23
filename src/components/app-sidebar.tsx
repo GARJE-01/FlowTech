@@ -42,7 +42,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         });
     };
 
-    const menuItems = [
+    const [mounted, setMounted] = React.useState(false);
+
+    React.useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    const menuItems = [ // ... menu items ...
         {
             title: "Dashboard",
             url: "/admin",
@@ -111,8 +117,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     <SidebarMenuItem>
                         <div className="flex items-center p-2 gap-2 text-sm text-muted-foreground group-data-[collapsible=icon]:hidden">
                             <div className="flex flex-col">
-                                <span className="font-medium text-foreground">{session.data?.user?.name || "User"}</span>
-                                <span className="text-xs">{session.data?.user?.email}</span>
+                                <span className="font-medium text-foreground">{mounted && session.data?.user?.name ? session.data.user.name : "User"}</span>
+                                <span className="text-xs">{mounted && session.data?.user?.email ? session.data.user.email : ""}</span>
                             </div>
                         </div>
                         <SidebarMenuButton onClick={handleSignOut} tooltip="Sign Out" className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20">

@@ -53,7 +53,7 @@ void main() {
     final container = ProviderContainer(
       overrides: [
         storageServiceProvider.overrideWith((ref) => storage),
-        shopProvider.overrideWith((ref) => ShopService(storage)),
+        shopProvider.overrideWith((ref) => ShopService(storage, ref)),
       ],
     );
     addTearDown(container.dispose);

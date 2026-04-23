@@ -4,7 +4,7 @@ import { DollarSign, Package, ShoppingCart, Users, Store, CheckCircle, Clipboard
 import { OverviewChart } from "@/components/dashboard/overview-chart";
 import { db } from "@/db";
 import { orders, productVariants, user, shops } from "@/db/schema";
-import { eq, sum, count, desc, sql, gte, and, ne } from "drizzle-orm";
+import { eq, sum, count, desc, sql, gte, and, ne, inArray } from "drizzle-orm";
 
 export default async function AdminDashboard() {
     // 1. Total Revenue (approved + delivered orders)
@@ -71,9 +71,11 @@ export default async function AdminDashboard() {
         salesmanName: user.name,
         salesmanEmail: user.email,
         createdAt: orders.createdAt,
+        status: orders.status,
     })
     .from(orders)
     .leftJoin(user, eq(orders.salesmanId, user.id))
+    .where(inArray(orders.status, ['approved', 'delivered']))
     .orderBy(desc(orders.createdAt))
     .limit(5);
 
