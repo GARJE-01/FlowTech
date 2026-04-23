@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 import '../../order/data/order_service.dart';
 import '../../order/domain/order_model.dart';
 import '../../auth/data/auth_service.dart';
 import '../../shop/data/shop_service.dart';
+import '../../shop/domain/shop_model.dart';
 import '../../payment/data/payment_service.dart';
 import 'package:go_router/go_router.dart';
 
@@ -32,10 +36,11 @@ class InvoiceScreen extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(LucideIcons.share2),
-            onPressed: () {
-               // Mock share implementation -> Could pass order to a new orderShareProvider
-               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Share functionality coming soon')));
-               // _showShareOptions(context, ref, order);
+            tooltip: 'Share Invoice',
+            onPressed: () async {
+              final shop = ref.read(shopProvider).where((s) => s.id == order.shopId).firstOrNull;
+              final salesmanName = ref.read(authProvider).user?.name ?? 'Unknown Salesman';
+              await _shareInvoice(context, order, shop, salesmanName);
             },
           ),
           IconButton(
@@ -240,7 +245,177 @@ class InvoiceScreen extends ConsumerWidget {
     );
   }
 
-// Placeholder for _showShareOptions if implemented later
+// --- Share Invoice ---
+  Future<void> _shareInvoice(BuildContext context, Order order, Shop? shop, String salesmanName) async {
+    try {
+      // Show loading
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Generating invoice PDF...'), duration: Duration(seconds: 1)),
+        );
+      }
+
+      final pdf = pw.Document();
+      final dateStr = DateFormat('dd-MM-yyyy').format(order.createdAt);
+
+      pdf.addPage(
+        pw.Page(
+          pageFormat: PdfPageFormat.a4,
+          build: (pw.Context ctx) {
+            return pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.stretch,
+              children: [
+                // Header
+                pw.Container(
+                  padding: const pw.EdgeInsets.all(16),
+                  color: PdfColors.blue50,
+                  child: pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                    children: [
+                      pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.start,
+                        children: [
+                          pw.Text('FlowTech Agency', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 18, color: PdfColors.blue700)),
+                          pw.Text('123, Industrial Area', style: const pw.TextStyle(fontSize: 10)),
+                          pw.Text('Pune, Maharashtra - 411057', style: const pw.TextStyle(fontSize: 10)),
+                          pw.Text('Ph: +91 98765 43210', style: const pw.TextStyle(fontSize: 10)),
+                          pw.Text('GSTIN: 27AABCT1332L1Z6', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10)),
+                        ],
+                      ),
+                      pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.end,
+                        children: [
+                          pw.Text('INVOICE', style: pw.TextStyle(fontSize: 22, fontWeight: pw.FontWeight.bold, color: PdfColors.grey)),
+                          pw.Text('# ...${order.id.substring(order.id.length - 6)}', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                          pw.Text('Date: $dateStr', style: const pw.TextStyle(fontSize: 10)),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                pw.Divider(),
+
+                // Bill To
+                pw.Padding(
+                  padding: const pw.EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  child: pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    children: [
+                      pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.start,
+                        children: [
+                          pw.Text('BILL TO:', style: pw.TextStyle(color: PdfColors.grey, fontSize: 9, fontWeight: pw.FontWeight.bold)),
+                          pw.SizedBox(height: 4),
+                          pw.Text('${order.shopName} (${shop?.ownerName ?? "Unknown"})', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 13)),
+                          pw.Text(shop?.address ?? 'Address not provided', style: const pw.TextStyle(fontSize: 10)),
+                          pw.Text('GSTIN: ${shop?.gstNumber ?? "N/A"}', style: const pw.TextStyle(fontSize: 10)),
+                        ],
+                      ),
+                      pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.end,
+                        children: [
+                          pw.Text('SALESMAN: $salesmanName', style: const pw.TextStyle(fontSize: 10)),
+                          pw.Text('Terms: Credit (7 Days)', style: const pw.TextStyle(fontSize: 10)),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                pw.Divider(),
+
+                // Items Table
+                pw.Padding(
+                  padding: const pw.EdgeInsets.symmetric(horizontal: 16),
+                  child: pw.Table(
+                    border: pw.TableBorder.all(color: PdfColors.grey300),
+                    columnWidths: {
+                      0: const pw.FlexColumnWidth(3),
+                      1: const pw.FlexColumnWidth(1),
+                      2: const pw.FlexColumnWidth(1.5),
+                      3: const pw.FlexColumnWidth(1.5),
+                    },
+                    children: [
+                      pw.TableRow(
+                        decoration: const pw.BoxDecoration(color: PdfColors.grey200),
+                        children: [
+                          pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text('ITEM', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10))),
+                          pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text('QTY', textAlign: pw.TextAlign.center, style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10))),
+                          pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text('RATE', textAlign: pw.TextAlign.right, style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10))),
+                          pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text('TOTAL', textAlign: pw.TextAlign.right, style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10))),
+                        ],
+                      ),
+                      ...order.items.map((item) => pw.TableRow(
+                        children: [
+                          pw.Padding(padding: const pw.EdgeInsets.all(5), child: pw.Text(item.productName, style: const pw.TextStyle(fontSize: 10))),
+                          pw.Padding(padding: const pw.EdgeInsets.all(5), child: pw.Text('${item.quantity}', textAlign: pw.TextAlign.center, style: const pw.TextStyle(fontSize: 10))),
+                          pw.Padding(padding: const pw.EdgeInsets.all(5), child: pw.Text('Rs.${item.pricePerUnit.toStringAsFixed(2)}', textAlign: pw.TextAlign.right, style: const pw.TextStyle(fontSize: 10))),
+                          pw.Padding(padding: const pw.EdgeInsets.all(5), child: pw.Text('Rs.${item.lineTotal.toStringAsFixed(2)}', textAlign: pw.TextAlign.right, style: const pw.TextStyle(fontSize: 10))),
+                        ],
+                      )),
+                    ],
+                  ),
+                ),
+
+                pw.SizedBox(height: 12),
+
+                // Totals
+                pw.Align(
+                  alignment: pw.Alignment.centerRight,
+                  child: pw.Padding(
+                    padding: const pw.EdgeInsets.only(right: 16),
+                    child: pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.end,
+                      children: [
+                        pw.Text('Subtotal: Rs.${order.subtotalAmount.toStringAsFixed(2)}', style: const pw.TextStyle(fontSize: 11)),
+                        pw.Text('CGST (9%): Rs.${(order.gstAmount / 2).toStringAsFixed(2)}', style: const pw.TextStyle(fontSize: 11)),
+                        pw.Text('SGST (9%): Rs.${(order.gstAmount / 2).toStringAsFixed(2)}', style: const pw.TextStyle(fontSize: 11)),
+                        pw.Divider(),
+                        pw.Text('GRAND TOTAL: Rs.${order.totalAmount.toStringAsFixed(0)}',
+                            style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14, color: PdfColors.blue700)),
+                      ],
+                    ),
+                  ),
+                ),
+
+                pw.Spacer(),
+
+                // Footer
+                pw.Container(
+                  color: PdfColors.grey100,
+                  padding: const pw.EdgeInsets.all(14),
+                  child: pw.Column(
+                    children: [
+                      pw.Text('Thank you for your business!', style: pw.TextStyle(fontStyle: pw.FontStyle.italic)),
+                      pw.SizedBox(height: 4),
+                      pw.Text(
+                        'Terms & Conditions: Goods once sold will not be taken back. Interest @ 18% p.a. after due date.',
+                        textAlign: pw.TextAlign.center,
+                        style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey700),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      );
+
+      // Share via native sheet
+      final pdfBytes = await pdf.save();
+      await Printing.sharePdf(bytes: pdfBytes, filename: 'Invoice-${order.id}.pdf');
+
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to generate invoice: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
+  }
+
+// ---- Payment History Sheet ----
 
   Widget _buildPaymentHistorySheet(BuildContext context, List<dynamic> payments, Order order) {
     payments.sort((a, b) => b.createdAt.compareTo(a.createdAt));
