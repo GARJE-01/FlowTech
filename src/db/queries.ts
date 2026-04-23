@@ -4,17 +4,24 @@ import { products, productVariants, stockLedger, suppliers, orders, user, orderI
 import { eq, desc } from "drizzle-orm";
 
 export async function getProductsWithVariants() {
-    const allProducts = await db.select().from(products);
-    const result = [];
+    // Fetch all products and all variants in just 2 queries (instead of N+1)
+    const [allProducts, allVariants] = await Promise.all([
+        db.select().from(products),
+        db.select().from(productVariants),
+    ]);
 
-    for (const p of allProducts) {
-        const variants = await db.select().from(productVariants).where(eq(productVariants.productId, p.id));
-        result.push({
-            ...p,
-            variants
-        });
+    // Group variants by productId in-memory
+    const variantsByProductId = new Map<number, typeof allVariants>();
+    for (const v of allVariants) {
+        const list = variantsByProductId.get(v.productId) || [];
+        list.push(v);
+        variantsByProductId.set(v.productId, list);
     }
-    return result;
+
+    return allProducts.map(p => ({
+        ...p,
+        variants: variantsByProductId.get(p.id) || [],
+    }));
 }
 
 export async function getStockLedger() {
